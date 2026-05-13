@@ -59,6 +59,33 @@
           ]
         },
         {
+          "name": "df",
+          "summary": "Report file system disk space usage",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-h",  "description": "Human-readable output (KB, MB, GB)" },
+            { "flag": "-T",  "description": "Show file system type" },
+            { "flag": "-i",  "description": "Show inode usage instead of block usage" }
+          ],
+          "examples": [
+            { "description": "Check disk space usage of all mounted file systems", "code": "df -hT" },
+            { "description": "Check inode usage to find if a file system is full of small files", "code": "df -hi" }
+          ]
+        },
+        {
+          "name": "cache",
+          "summary": "Clear file system caches to free memory or test performance",
+          "tags": ["admin", "debug"],
+          "options": [
+            { "flag": "echo 1 > /proc/sys/vm/drop_caches", "description": "Clear page cache" },
+            { "flag": "echo 2 > /proc/sys/vm/drop_caches", "description": "Clear dentries and inodes" },
+            { "flag": "echo 3 > /proc/sys/vm/drop_caches", "description": "Clear all caches" }
+          ],
+          "examples": [         
+            { "description": "Clear all file system caches (requires root)", "code": "echo 3 > /proc/sys/vm/drop_caches" }
+          ],
+        },
+        {
           "name": "chmod",
           "summary": "Change file mode (permissions)",
           "tags": ["admin"],
