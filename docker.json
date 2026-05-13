@@ -8,6 +8,20 @@
       "description": "Run, manage, inspect, and debug containers",
       "commands": [
         {
+          "name": "docker ps",
+          "summary": "List running containers",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-a",  "description": "Show all containers (default shows just running)" },
+            { "flag": "-q",  "description": "Only display container IDs" },
+            { "flag": "--filter", "description": "Filter output based on conditions (e.g. status=exited)" },
+            { "flag": "--format", "description": "Format output using a Go template" }
+          ],
+          "examples": [
+            { "description": "List all containers with custom format", "code": "docker ps -a --format 'table {{.ID}}\t{{.Names}}\t{{.Status}}'" }
+          ]
+        },
+        {
           "name": "docker run",
           "summary": "Create and start a new container from an image",
           "tags": ["day-to-day"],
@@ -74,6 +88,30 @@
             { "description": "Get a container's IP address", "code": "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mycontainer" },
             { "description": "Get mounted volumes", "code": "docker inspect -f '{{json .Mounts}}' mycontainer | jq" },
             { "description": "Check restart policy and status", "code": "docker inspect -f '{{.HostConfig.RestartPolicy}}' mycontainer" }
+          ]
+        },
+        {
+          "name": "docker stop",
+          "summary": "Stop a running container gracefully (default timeout: 10s)",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-t SECONDS", "description": "Seconds to wait for graceful stop before killing (default: 10)" }
+          ],
+          "examples": [
+            { "description": "Stop a container with default timeout", "code": "docker stop mycontainer" },
+            { "description": "Stop a container with a custom timeout", "code": "docker stop -t 30 mycontainer" }
+          ]
+        },
+        {
+          "name": "docker kill",
+          "summary": "Send a signal to a running container (default: SIGKILL)",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-s SIGNAL", "description": "Specify the signal to send (e.g. SIGTERM, SIGINT)" }
+          ],
+          "examples": [
+            { "description": "Forcefully stop a container", "code": "docker kill mycontainer" },
+            { "description": "Gracefully stop a container with SIGTERM", "code": "docker kill -s SIGTERM mycontainer" }
           ]
         },
         {

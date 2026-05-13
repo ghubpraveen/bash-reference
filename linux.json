@@ -73,6 +73,21 @@
           ]
         },
         {
+          "name": "free",
+          "summary": "Display memory usage and availability",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-h",  "description": "Human-readable output (KB, MB, GB)" },
+            { "flag": "-m",  "description": "Show memory in megabytes" },
+            { "flag": "-g",  "description": "Show memory in gigabytes" },
+            { "flag": "-s N", "description": "Display every N seconds (for monitoring)" }
+          ],
+          "examples": [ 
+            { "description": "Check current memory usage", "code": "free -h" },
+            { "description": "Monitor memory usage every 5 seconds", "code": "free -h -s 5" }
+          ]
+        },
+        {
           "name": "cache",
           "summary": "Clear file system caches to free memory or test performance",
           "tags": ["admin", "debug"],
@@ -109,6 +124,17 @@
           ],
           "examples": [
             { "description": "Give app user ownership of a directory", "code": "chown -R appuser:appgroup /opt/myapp" }
+          ]
+        },
+        {
+          "name": "groupadd",
+          "summary": "Create a new user group",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "GROUPNAME", "description": "Name of the new group" }
+          ],
+          "examples": [
+            { "description": "Create a group named 'developers'", "code": "groupadd developers" }
           ]
         }
       ]
@@ -184,6 +210,34 @@
             { "description": "Delete lines containing a pattern", "code": "sed -i '/^#/d' config.conf" },
             { "description": "Print lines 10 to 20", "code": "sed -n '10,20p' large_file.log" }
           ]
+        },
+        {
+          "name": "sort",
+          "summary": "Sort lines of text",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-n",     "description": "Sort numerically" },
+            { "flag": "-r",     "description": "Sort in reverse order" },
+            { "flag": "-k N",   "description": "Sort by field N" }
+          ],
+          "examples": [
+            { "description": "Sort a file alphabetically", "code": "sort file.txt" },
+            { "description": "Sort numbers in descending order", "code": "sort -nr numbers.txt" },
+            { "description": "Sort by the 3rd column", "code": "sort -k 3 data.txt" }
+          ]
+        },
+        {
+          "name": "crontab",
+          "summary": "Edit cron jobs for the current user",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-l",     "description": "List current cron jobs" },
+            { "flag": "-e",     "description": "Edit current cron jobs" }
+          ],
+          "examples": [
+            { "description": "List all scheduled cron jobs", "code": "crontab -l" },
+            { "description": "Edit the cron job file", "code": "crontab -e" }
+          ]
         }
       ]
     },
@@ -205,6 +259,19 @@
             { "description": "Show top memory consumers", "code": "ps aux --sort=-%mem | head -10" },
             { "description": "Show process tree", "code": "ps -ef --forest" }
           ]
+        },
+        {
+          "name": "nohup",
+          "summary": "Run a command immune to hangups, with output to a file",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "COMMAND", "description": "The command to run" },
+            { "flag": "&",       "description": "Run in background" }
+          ],
+          "examples": [
+            { "description": "Run a long process in the background, ignoring hangups", "code": "nohup my_long_script.sh > output.log 2>&1 &" }
+          ],
+          "note": "Output is written to nohup.out by default if not redirected. Use 'disown' in bash to remove a job from the shell's job control after starting it." 
         },
         {
           "name": "kill / killall",
@@ -284,6 +351,117 @@
           ]
         },
         {
+          "name": "wget",
+          "summary": "Non-interactive network downloader",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-O FILE",    "description": "Write output to FILE instead of stdout" },
+            { "flag": "-q",         "description": "Quiet mode (no output)" },
+            { "flag": "-c",         "description": "Continue an incomplete download" },
+            { "flag": "-r",         "description": "Recursive download (for websites)" },
+            { "flag": "-l N",       "description": "Set maximum recursion depth" },
+            { "flag": "-np",        "description": "No parent: don't ascend to parent directories when recursing" },
+            { "flag": "-k",         "description": "Convert links to make downloaded site browsable offline" }
+          ],
+          "examples": [
+            { "description": "Download a file to a specific location", "code": "wget -O /tmp/data.csv https://example.com/data.csv" },
+            { "description": "Continue a broken download", "code": "wget -c https://example.com/largefile.zip" },
+            { "description": "Mirror a website for offline browsing", "code": "wget -r -l 2 -np -k https://example.com" }
+          ]
+        },
+        {
+          "name": "ping",
+          "summary": "Check network connectivity to a host and measure latency",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-c N",  "description": "Send only N packets then stop" },
+            { "flag": "-i N",  "description": "Wait N seconds between packets" },
+            { "flag": "-s SIZE", "description": "Send packets of SIZE bytes (default 56)" },
+            { "flag": "-W N",  "description": "Wait up to N seconds for a response" }
+          ],
+          "examples": [
+            { "description": "Ping a host 5 times", "code": "ping -c 5 example.com" },
+            { "description": "Ping with larger packet size to test MTU issues", "code": "ping -s 1200 example.com" }
+          ]
+        },
+        {
+          "name": "telnet",
+          "summary": "Test connectivity to a specific TCP port",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "HOST PORT", "description": "Specify the host and port to connect to" }
+          ],
+          "examples": [
+            { "description": "Test if a service is listening on port 80", "code": "telnet example.com 80" },
+            { "description": "Test connectivity to a database port", "code": "telnet db.example.com 5432" }
+          ],
+          "note": "telnet is a simple TCP client. If it connects successfully, you'll see a blank screen. If it fails, you'll get a connection error. Use Ctrl+] to exit telnet."
+        },
+        {
+          "name": "nslookup / dig",
+          "summary": "Query DNS information",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "HOST", "description": "Specify the host to query" }
+          ],
+          "examples": [
+            { "description": "Lookup the IP address of a domain", "code": "nslookup example.com" },
+            { "description": "Perform a DNS query for MX records", "code": "dig example.com MX" }
+          ]
+        },
+        {
+          "name": "ssh",
+          "summary": "Securely connect to a remote server's shell",
+          "tags": ["day-to-day", "admin"],
+          "options": [
+            { "flag": "-p PORT",   "description": "Connect to a non-standard SSH port" },
+            { "flag": "-i KEYFILE", "description": "Use a specific private key file for authentication" },
+            { "flag": "-L",        "description": "Set up local port forwarding (e.g. -L 8080:localhost:80)" },
+            { "flag": "-R",        "description": "Set up remote port forwarding" },
+            { "flag": "-D",        "description": "Set up dynamic port forwarding (SOCKS proxy)" },
+            { "flag": "-N",        "description": "Don't execute a remote command (useful for port forwarding)" },
+            { "flag": "-T",        "description": "Disable pseudo-tty allocation (useful for scripting)" }
+          ],
+          "examples": [
+            { "description": "Connect to a server with a specific key", "code": "ssh -i ~/.ssh/id_rsa user@host" },
+            { "description": "Set up local port forwarding to access a web service on the remote server", "code": "ssh -L 8080:localhost:80 user@host" },
+            { "description": "Set up a SOCKS proxy for secure web browsing through the server", "code": "ssh -D 1080 user@host" }
+          ],
+          "note": "Ensure your SSH keys are properly secured. Use ssh-agent to manage keys and avoid entering passphrases repeatedly."
+        },
+        {
+          "name": "scp",
+          "summary": "Securely copy files between hosts over SSH",
+          "tags": ["day-to-day", "admin"],
+          "options": [
+            { "flag": "-P PORT",   "description": "Connect to a non-standard SSH port" },
+            { "flag": "-i KEYFILE", "description": "Use a specific private key file for authentication" },
+            { "flag": "-r",        "description": "Copy directories recursively" }
+          ],
+          "examples": [
+            { "description": "Copy a file from local to remote", "code": "scp -i ~/.ssh/id_rsa file.txt user@host:/path/to/destination/" },
+            { "description": "Copy a file from remote to local", "code": "scp -i ~/.ssh/id_rsa user@host:/path/to/file.txt /local/destination/" },
+            { "description": "Copy a directory recursively", "code": "scp -i ~/.ssh/id_rsa -r mydir user@host:/path/to/destination/" }
+          ]
+        },
+        {
+          "name": "rsync",
+          "summary": "Efficiently synchronize files and directories between hosts",
+          "tags": ["day-to-day", "admin"],
+          "options": [
+            { "flag": "-a",        "description": "Archive mode: preserve permissions, timestamps, symbolic links, etc." },
+            { "flag": "-v",        "description": "Verbose output" },
+            { "flag": "-z",        "description": "Compress files during transfer" },
+            { "flag": "-e ssh",    "description": "Use SSH for remote shell" },
+            { "flag": "--delete",   "description": "Delete files in destination that are not in source" }
+          ],
+          "examples": [
+            { "description": "Sync a local directory to a remote server", "code": "rsync -avz -e ssh /local/dir/ user@host:/remote/dir/" },
+            { "description": "Sync a remote directory to local", "code": "rsync -avz -e ssh user@host:/remote/dir/ /local/dir/" },
+            { "description": "Sync and delete extraneous files in destination", "code": "rsync -avz --delete -e ssh /local/dir/ user@host:/remote/dir/" }
+          ]
+        },
+        {
           "name": "ss / netstat",
           "summary": "Display socket and network connection statistics",
           "tags": ["debug", "network"],
@@ -344,6 +522,24 @@
             { "description": "Follow nginx logs live", "code": "journalctl -u nginx -f" },
             { "description": "Show errors from the last hour", "code": "journalctl -p err --since '1 hour ago'" },
             { "description": "Show logs from last boot for a service", "code": "journalctl -b -u myapp.service" }
+          ]
+        },
+        {
+          "name": "systemctl",
+          "summary": "Control and inspect systemd services and units",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "status SERVICE", "description": "Show status and recent logs of a service" },
+            { "flag": "start SERVICE",  "description": "Start a service" },
+            { "flag": "stop SERVICE",   "description": "Stop a service" },
+            { "flag": "restart SERVICE", "description": "Restart a service" },
+            { "flag": "enable SERVICE",  "description": "Enable a service to start on boot" },
+            { "flag": "disable SERVICE", "description": "Disable a service from starting on boot" }
+          ],
+          "examples": [
+            { "description": "Check the status of a service", "code": "systemctl status nginx" },
+            { "description": "Restart a service after configuration changes", "code": "systemctl restart myapp.service" },
+            { "description": "Enable a service to start on boot", "code": "systemctl enable myapp.service" }
           ]
         },
         {
