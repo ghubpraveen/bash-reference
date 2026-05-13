@@ -83,7 +83,7 @@
           ],
           "examples": [         
             { "description": "Clear all file system caches (requires root)", "code": "echo 3 > /proc/sys/vm/drop_caches" }
-          ],
+          ]
         },
         {
           "name": "chmod",
