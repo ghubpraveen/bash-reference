@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bash Reference for CI/CD</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+
+    .sidebar {
+      width: 300px;
+      background: #111827;
+      border-right: 1px solid #334155;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .sidebar h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #1e293b;
+      border-radius: 10px;
+      text-decoration: none;
+      color: white;
+      transition: 0.2s;
+    }
+
+    .nav-item:hover {
+      background: #334155;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    details summary {
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    .command-card {
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .command-card h3 {
+      color: #67e8f9;
+      margin-bottom: 10px;
+    }
+
+    .command-card p {
+      margin-bottom: 12px;
+      color: #cbd5e1;
+    }
+
+    pre {
+      background: black;
+      color: #86efac;
+      padding: 14px;
+      border-radius: 10px;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #334155;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h1>Bash Reference</h1>
+
+    <button class="nav-item" onclick="showSection('navigation')">Navigation Commands</button>
+    <button class="nav-item" onclick="showSection('files')">File Commands</button>
+    <button class="nav-item" onclick="showSection('search')">Search & Filtering</button>
+    <button class="nav-item" onclick="showSection('text')">Text Processing</button>
+    <button class="nav-item" onclick="showSection('variables')">Variables & Input</button>
+    <button class="nav-item" onclick="showSection('logic')">Conditions & Loops</button>
+    <button class="nav-item" onclick="showSection('pipes')">Pipes & Redirection</button>
+    <button class="nav-item" onclick="showSection('git')">Git & GitHub</button>
+    <button class="nav-item" onclick="showSection('docker')">Docker</button>
+    <button class="nav-item" onclick="showSection('kubernetes')">Kubernetes</button>
+    <button class="nav-item" onclick="showSection('linux-admin')">Linux Admin</button>
+    <button class="nav-item" onclick="showSection('networking')">Networking</button>
+    <button class="nav-item" onclick="showSection('cloud')">Cloud & Infra</button>
+    <button class="nav-item" onclick="showSection('patterns')">CI/CD Patterns</button>
+  </div>
+
+  <div class="content">
+
+    <div class="section" id="navigation">
+      <details open>
+        <!-- <summary>Navigation Commands</summary> -->
+
+        <div class="command-card">
+          <h3>pwd</h3>
+          <p>Print current working directory</p>
+          <pre><code>pwd</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>ls</h3>
+          <p>List files and directories</p>
+          <pre><code>ls -la</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>cd</h3>
+          <p>Change directory</p>
+          <pre><code>cd /home/project</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="files">
+      <details>
+        <!-- <summary>File Commands</summary> -->
+
+        <div class="command-card">
+          <h3>mkdir</h3>
+          <p>Create directories</p>
+          <pre><code>mkdir -p app/config/dev</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>touch</h3>
+          <p>Create empty files</p>
+          <pre><code>touch test.txt</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>rm</h3>
+          <p>Remove files/directories</p>
+          <pre><code>rm -rf temp/</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="search">
+      <details>
+        <!-- <summary>Search & Filtering</summary> -->
+
+        <div class="command-card">
+          <h3>grep</h3>
+          <p>Search text patterns</p>
+          <pre><code>grep "ERROR" app.log</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>find</h3>
+          <p>Find files and directories</p>
+          <pre><code>find . -name "*.sh"</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="text">
+      <details>
+        <!-- <summary>Text Processing</summary> -->
+
+        <div class="command-card">
+          <h3>awk</h3>
+          <p>Field-based text processing</p>
+          <pre><code>awk '{print $1}' file.txt</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>sed</h3>
+          <p>Stream editor and replacements</p>
+          <pre><code>sed 's/hello/world/' file.txt</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>cut</h3>
+          <p>Extract columns</p>
+          <pre><code>cut -d ':' -f1 /etc/passwd</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="variables">
+      <details>
+        <!-- <summary>Variables & Input</summary> -->
+
+        <div class="command-card">
+          <h3>Variables</h3>
+          <p>Store values</p>
+          <pre><code>name="Praveen"
+echo "$name"</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>read</h3>
+          <p>Read user input or parse lines</p>
+          <pre><code>while read -r status file</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="logic">
+      <details>
+        <!-- <summary>Conditions & Loops</summary> -->
+
+        <div class="command-card">
+          <h3>if</h3>
+          <p>Conditional execution</p>
+          <pre><code>if [[ -f test.txt ]]; then
+  echo "Exists"
+fi</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>case</h3>
+          <p>Pattern matching</p>
+          <pre><code>case "$status" in
+  A) echo "Added" ;;
+esac</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="pipes">
+      <details>
+        <!-- <summary>Pipes & Redirection</summary> -->
+
+        <div class="command-card">
+          <h3>Pipe |</h3>
+          <p>Pass output between commands</p>
+          <pre><code>cat app.log | grep ERROR</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>Redirect ></h3>
+          <p>Overwrite file output</p>
+          <pre><code>echo "hello" > file.txt</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="git">
+      <details>
+        <!-- <summary>Git & GitHub Commands</summary> -->
+
+        <div class="command-card">
+          <h3>git clone</h3>
+          <p>Clone repositories</p>
+          <pre><code>git clone https://github.com/org/repo.git</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>git status</h3>
+          <p>Show repository status</p>
+          <pre><code>git status</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>git diff</h3>
+          <p>Compare changes</p>
+          <pre><code>git diff --name-status origin/main...HEAD</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>git fetch</h3>
+          <p>Fetch remote changes</p>
+          <pre><code>git fetch origin main</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>git log</h3>
+          <p>View commit history</p>
+          <pre><code>git log --oneline --graph</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>gh pr create</h3>
+          <p>Create pull request using GitHub CLI</p>
+          <pre><code>gh pr create --base main --head feature-branch</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="docker">
+      <details>
+        <!-- <summary>Docker Commands</summary> -->
+
+        <div class="command-card">
+          <h3>docker build</h3>
+          <p>Build Docker image</p>
+          <pre><code>docker build -t my-app:1.0 .</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>docker run</h3>
+          <p>Run container</p>
+          <pre><code>docker run -p 8080:8080 my-app:1.0</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>docker ps</h3>
+          <p>List running containers</p>
+          <pre><code>docker ps -a</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>docker logs</h3>
+          <p>View container logs</p>
+          <pre><code>docker logs -f container-id</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>docker exec</h3>
+          <p>Execute commands inside container</p>
+          <pre><code>docker exec -it container-id bash</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="kubernetes">
+      <details>
+        <!-- <summary>Kubernetes Commands</summary> -->
+
+        <div class="command-card">
+          <h3>kubectl get pods</h3>
+          <p>List pods</p>
+          <pre><code>kubectl get pods -A</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>kubectl describe</h3>
+          <p>Describe resources</p>
+          <pre><code>kubectl describe pod my-pod</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>kubectl logs</h3>
+          <p>View pod logs</p>
+          <pre><code>kubectl logs -f pod-name</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>kubectl exec</h3>
+          <p>Execute command inside pod</p>
+          <pre><code>kubectl exec -it pod-name -- bash</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>kubectl apply</h3>
+          <p>Apply manifests</p>
+          <pre><code>kubectl apply -f deployment.yaml</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="linux-admin">
+      <details>
+        <!-- <summary>Linux Administration Commands</summary> -->
+
+        <div class="command-card">
+          <h3>systemctl</h3>
+          <p>Manage Linux services</p>
+          <pre><code>systemctl status nginx</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>journalctl</h3>
+          <p>View system logs</p>
+          <pre><code>journalctl -u nginx -f</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>df</h3>
+          <p>Disk space usage</p>
+          <pre><code>df -h</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>free</h3>
+          <p>Memory usage</p>
+          <pre><code>free -m</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>top</h3>
+          <p>Monitor processes</p>
+          <pre><code>top</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="networking">
+      <details>
+        <!-- <summary>Networking Commands</summary> -->
+
+        <div class="command-card">
+          <h3>curl</h3>
+          <p>Make HTTP requests</p>
+          <pre><code>curl -X GET https://api.example.com</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>wget</h3>
+          <p>Download files</p>
+          <pre><code>wget https://example.com/file.zip</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>ping</h3>
+          <p>Test connectivity</p>
+          <pre><code>ping google.com</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>netstat</h3>
+          <p>Check listening ports</p>
+          <pre><code>netstat -tulpn</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="cloud">
+      <details>
+        <!-- <summary>Cloud & Infrastructure Commands</summary> -->
+
+        <div class="command-card">
+          <h3>terraform init</h3>
+          <p>Initialize Terraform project</p>
+          <pre><code>terraform init</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>terraform plan</h3>
+          <p>Preview infrastructure changes</p>
+          <pre><code>terraform plan</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>terraform apply</h3>
+          <p>Apply infrastructure changes</p>
+          <pre><code>terraform apply</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>ssh</h3>
+          <p>Connect to remote server</p>
+          <pre><code>ssh user@server-ip</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>scp</h3>
+          <p>Copy files to remote server</p>
+          <pre><code>scp app.jar user@server:/opt/apps</code></pre>
+        </div>
+      </details>
+    </div>
+
+  </div>
+  <script>
+  function showSection(sectionId) {
+
+      // Get all sections
+      const sections = document.querySelectorAll('.section');
+
+      // Hide all sections
+      sections.forEach(section => {
+          section.style.display = 'none';
+      });
+
+      // Show selected section
+      document.getElementById(sectionId).style.display = 'block';
+  }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,497 @@
+{
+  "tool": "Bash",
+  "icon": "📜",
+  "description": "Bash scripting constructs, builtins, and patterns for writing robust shell scripts",
+  "categories": [
+    {
+      "name": "Script Structure",
+      "description": "Boilerplate, headers, and foundational patterns every script should have",
+      "commands": [
+        {
+          "name": "shebang & set flags",
+          "summary": "Define the interpreter and enable strict mode to catch errors early",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "set -e",   "description": "Exit immediately if any command returns non-zero" },
+            { "flag": "set -u",   "description": "Treat unset variables as errors" },
+            { "flag": "set -o pipefail", "description": "Catch failures inside pipelines (not just the last command)" },
+            { "flag": "set -x",   "description": "Print each command before executing it (debug trace)" },
+            { "flag": "set -E",   "description": "ERR traps are inherited by functions and subshells" }
+          ],
+          "examples": [
+            { "description": "Standard strict-mode header for all scripts", "code": "#!/usr/bin/env bash\nset -euo pipefail" },
+            { "description": "Enable debug tracing for a block then disable it", "code": "set -x\nmy_function\nset +x" }
+          ],
+          "note": "set -u will cause issues if you use $@ or $* on an empty argument list. Use ${1:-} as a safe default."
+        },
+        {
+          "name": "trap",
+          "summary": "Run cleanup code when the script exits, errors, or receives a signal",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "EXIT",   "description": "Runs on any exit (normal or error) — best for cleanup" },
+            { "flag": "ERR",    "description": "Runs when a command fails (combine with set -E)" },
+            { "flag": "INT",    "description": "Runs on Ctrl+C (SIGINT)" },
+            { "flag": "TERM",   "description": "Runs on SIGTERM (e.g. kill command)" },
+            { "flag": "-",      "description": "Reset a trap to its default behavior" }
+          ],
+          "examples": [
+            { "description": "Clean up a temp directory on exit", "code": "TMPDIR=$(mktemp -d)\ntrap 'rm -rf \"$TMPDIR\"' EXIT" },
+            { "description": "Print error location on failure", "code": "trap 'echo \"Error on line $LINENO\"' ERR" },
+            { "description": "Graceful shutdown on SIGTERM", "code": "trap 'echo \"Shutting down...\"; cleanup; exit 0' TERM INT" }
+          ]
+        },
+        {
+          "name": "Functions",
+          "summary": "Define reusable blocks of code with local variables and return values",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "local",    "description": "Declare a variable scoped to the function only" },
+            { "flag": "return N", "description": "Exit function with a status code (0 = success)" },
+            { "flag": "$1..$N",   "description": "Positional arguments passed to the function" },
+            { "flag": "readonly", "description": "Declare a constant that cannot be reassigned" }
+          ],
+          "examples": [
+            { "description": "Function with local variables and return code", "code": "is_even() {\n  local num=$1\n  (( num % 2 == 0 ))\n}" },
+            { "description": "Logging helper with timestamp", "code": "log() {\n  local level=$1; shift\n  echo \"[$(date '+%Y-%m-%d %H:%M:%S')] [$level] $*\"\n}\nlog INFO 'Deploy started'" },
+            { "description": "Return a value via stdout (command substitution)", "code": "get_version() {\n  local version\n  version=$(cat VERSION)\n  echo \"$version\"\n}\nVERSION=$(get_version)" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Variables & Parameters",
+      "description": "Variable assignment, expansion, defaults, and string manipulation",
+      "commands": [
+        {
+          "name": "Parameter Expansion",
+          "summary": "Manipulate variables inline — defaults, substrings, replacements, lengths",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "${VAR:-default}",    "description": "Use default if VAR is unset or empty" },
+            { "flag": "${VAR:=default}",    "description": "Assign and use default if VAR is unset or empty" },
+            { "flag": "${VAR:?message}",    "description": "Error and exit if VAR is unset or empty" },
+            { "flag": "${VAR:+value}",      "description": "Use value only if VAR is set (else empty)" },
+            { "flag": "${#VAR}",            "description": "Length of the string in VAR" },
+            { "flag": "${VAR:offset:len}",  "description": "Substring: start at offset, take len characters" },
+            { "flag": "${VAR/old/new}",     "description": "Replace first occurrence of old with new" },
+            { "flag": "${VAR//old/new}",    "description": "Replace all occurrences of old with new" },
+            { "flag": "${VAR#pattern}",     "description": "Strip shortest match of pattern from the front" },
+            { "flag": "${VAR##pattern}",    "description": "Strip longest match of pattern from the front" },
+            { "flag": "${VAR%pattern}",     "description": "Strip shortest match of pattern from the end" },
+            { "flag": "${VAR%%pattern}",    "description": "Strip longest match of pattern from the end" },
+            { "flag": "${VAR^^}",           "description": "Convert to UPPERCASE" },
+            { "flag": "${VAR,,}",           "description": "Convert to lowercase" }
+          ],
+          "examples": [
+            { "description": "Use a default value if argument not provided", "code": "ENV=${1:-development}" },
+            { "description": "Require a variable to be set or fail", "code": "DB_HOST=${DB_HOST:?'DB_HOST must be set'}" },
+            { "description": "Strip path from filename (like basename)", "code": "path='/var/log/app.log'\nfilename=${path##*/}  # → app.log" },
+            { "description": "Strip extension from filename", "code": "file='deploy.sh'\nname=${file%.*}  # → deploy" },
+            { "description": "Replace all spaces with underscores", "code": "clean=${input// /_}" }
+          ]
+        },
+        {
+          "name": "Special Variables",
+          "summary": "Built-in variables that Bash automatically populates",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "$0",     "description": "Name of the script itself" },
+            { "flag": "$1..$9", "description": "Positional arguments (use ${10} for 10+)" },
+            { "flag": "$@",     "description": "All arguments as separate quoted strings" },
+            { "flag": "$*",     "description": "All arguments as a single word" },
+            { "flag": "$#",     "description": "Number of arguments passed" },
+            { "flag": "$?",     "description": "Exit code of the last command" },
+            { "flag": "$$",     "description": "PID of the current shell" },
+            { "flag": "$!",     "description": "PID of the last background process" },
+            { "flag": "$LINENO","description": "Current line number in the script" },
+            { "flag": "$FUNCNAME","description": "Name of the current function" },
+            { "flag": "$BASH_SOURCE","description": "Path of the script being executed" },
+            { "flag": "PIPESTATUS", "description": "Array of exit codes from last pipeline" }
+          ],
+          "examples": [
+            { "description": "Check if a required argument was passed", "code": "[[ $# -lt 1 ]] && echo \"Usage: $0 <env>\" && exit 1" },
+            { "description": "Get the directory where the script lives", "code": "SCRIPT_DIR=$(cd \"$(dirname \"${BASH_SOURCE[0]}\")\" && pwd)" },
+            { "description": "Capture exit code of a command", "code": "my_command || true\nSTATUS=$?\necho \"Exit code: $STATUS\"" }
+          ]
+        },
+        {
+          "name": "Arrays",
+          "summary": "Indexed and associative arrays for storing lists and key-value pairs",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "arr=(a b c)",          "description": "Declare an indexed array" },
+            { "flag": "${arr[N]}",             "description": "Access element at index N" },
+            { "flag": "${arr[@]}",             "description": "All elements (separately quoted)" },
+            { "flag": "${#arr[@]}",            "description": "Number of elements" },
+            { "flag": "arr+=(d)",              "description": "Append an element" },
+            { "flag": "declare -A map",        "description": "Declare an associative array (dictionary)" },
+            { "flag": "${!map[@]}",            "description": "All keys of an associative array" }
+          ],
+          "examples": [
+            { "description": "Loop over all elements of an array", "code": "services=(api worker scheduler)\nfor svc in \"${services[@]}\"; do\n  echo \"Starting $svc\"\ndone" },
+            { "description": "Associative array as a lookup table", "code": "declare -A PORTS=([api]=8080 [db]=5432 [cache]=6379)\necho \"API runs on port ${PORTS[api]}\"" },
+            { "description": "Capture command output into an array", "code": "mapfile -t pods < <(kubectl get pods -o name)\necho \"Found ${#pods[@]} pods\"" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Control Flow",
+      "description": "Conditionals, loops, and flow control constructs",
+      "commands": [
+        {
+          "name": "if / [[ ]]",
+          "summary": "Conditional branching with the modern [[ ]] test syntax",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-z STRING",   "description": "True if string is empty" },
+            { "flag": "-n STRING",   "description": "True if string is non-empty" },
+            { "flag": "== / !=",     "description": "String equality / inequality" },
+            { "flag": "=~",          "description": "Regex match (result in BASH_REMATCH)" },
+            { "flag": "-eq/-ne",     "description": "Numeric equal / not equal" },
+            { "flag": "-lt/-gt",     "description": "Numeric less-than / greater-than" },
+            { "flag": "-le/-ge",     "description": "Numeric less-or-equal / greater-or-equal" },
+            { "flag": "-f FILE",     "description": "True if FILE exists and is a regular file" },
+            { "flag": "-d DIR",      "description": "True if DIR exists and is a directory" },
+            { "flag": "-e PATH",     "description": "True if PATH exists (any type)" },
+            { "flag": "-r/-w/-x",    "description": "True if readable / writable / executable" },
+            { "flag": "-s FILE",     "description": "True if FILE exists and is non-empty" },
+            { "flag": "&&  ||",      "description": "Logical AND / OR within [[ ]]" }
+          ],
+          "examples": [
+            { "description": "Check if a required config file exists", "code": "if [[ ! -f config.yaml ]]; then\n  echo 'ERROR: config.yaml not found' >&2\n  exit 1\nfi" },
+            { "description": "Match a string with regex", "code": "if [[ $version =~ ^[0-9]+\\.[0-9]+\\.[0-9]+$ ]]; then\n  echo 'Valid semver'\nfi" },
+            { "description": "Check string is non-empty", "code": "if [[ -n \"$API_KEY\" ]]; then\n  echo 'API key is set'\nfi" }
+          ]
+        },
+        {
+          "name": "for loop",
+          "summary": "Iterate over lists, ranges, arrays, or command output",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "for x in list",      "description": "Iterate over a space/newline-separated list" },
+            { "flag": "for i in {1..N}",    "description": "Iterate over a numeric range" },
+            { "flag": "for i in {0..N..S}", "description": "Range with step S" },
+            { "flag": "for (( i=0; i<N; i++ ))", "description": "C-style numeric for loop" }
+          ],
+          "examples": [
+            { "description": "Loop over environment names", "code": "for env in dev staging production; do\n  echo \"Deploying to $env\"\ndone" },
+            { "description": "C-style loop with counter", "code": "for (( i=1; i<=5; i++ )); do\n  echo \"Attempt $i\"\ndone" },
+            { "description": "Loop over files matching a glob", "code": "for f in /etc/nginx/conf.d/*.conf; do\n  nginx -t -c \"$f\" && echo \"$f OK\"\ndone" }
+          ]
+        },
+        {
+          "name": "while / until loop",
+          "summary": "Loop based on a condition or read input line by line",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "while read -r line", "description": "Read a file or stream line by line" },
+            { "flag": "while true",         "description": "Infinite loop (use break to exit)" },
+            { "flag": "until CONDITION",    "description": "Loop until condition becomes true" },
+            { "flag": "break / continue",   "description": "Exit loop or skip to next iteration" }
+          ],
+          "examples": [
+            { "description": "Process a file line by line", "code": "while IFS= read -r line; do\n  echo \"Processing: $line\"\ndone < input.txt" },
+            { "description": "Retry a command up to 5 times with backoff", "code": "for i in {1..5}; do\n  curl -sf https://api.example.com/health && break\n  echo \"Retry $i failed, waiting...\"\n  sleep $((i * 2))\ndone" },
+            { "description": "Wait until a service is ready", "code": "until curl -sf http://localhost:8080/health; do\n  echo 'Waiting for service...'\n  sleep 2\ndone" }
+          ]
+        },
+        {
+          "name": "case statement",
+          "summary": "Multi-branch matching on string patterns — cleaner than many if/elif chains",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "pattern)",  "description": "Match a literal or glob pattern" },
+            { "flag": "p1|p2)",    "description": "Match either pattern p1 or p2" },
+            { "flag": "*)",        "description": "Default fallthrough (like 'else')" },
+            { "flag": ";;&",       "description": "Continue testing subsequent patterns (fall-through)" }
+          ],
+          "examples": [
+            { "description": "Dispatch based on CLI argument", "code": "case \"$1\" in\n  start)   start_service ;;\n  stop)    stop_service ;;\n  restart) stop_service; start_service ;;\n  *)       echo \"Usage: $0 {start|stop|restart}\"; exit 1 ;;\nesac" },
+            { "description": "Match OS type", "code": "case \"$(uname -s)\" in\n  Linux*)  OS=linux ;;\n  Darwin*) OS=macos ;;\n  *)       OS=unknown ;;\nesac" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Input & Output",
+      "description": "Read user input, format output, redirect streams, and handle pipes",
+      "commands": [
+        {
+          "name": "read",
+          "summary": "Read input from stdin or a file into variables",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-r",       "description": "Raw mode: don't interpret backslash escapes" },
+            { "flag": "-p PROMPT","description": "Display a prompt string before reading" },
+            { "flag": "-s",       "description": "Silent mode: don't echo input (for passwords)" },
+            { "flag": "-t N",     "description": "Timeout after N seconds" },
+            { "flag": "-n N",     "description": "Read at most N characters" },
+            { "flag": "-a ARRAY", "description": "Read words into an array" },
+            { "flag": "-d DELIM", "description": "Read until DELIM character instead of newline" },
+            { "flag": "IFS=",     "description": "Set field separator for splitting (empty = preserve whitespace)" }
+          ],
+          "examples": [
+            { "description": "Prompt for confirmation", "code": "read -rp 'Deploy to production? [y/N]: ' confirm\n[[ $confirm == [yY] ]] || exit 0" },
+            { "description": "Read a password without echoing it", "code": "read -rsp 'Password: ' password\necho" },
+            { "description": "Split a CSV line into an array", "code": "IFS=',' read -ra fields <<< \"name,age,role\"\necho \"Name: ${fields[0]}\"" }
+          ]
+        },
+        {
+          "name": "printf",
+          "summary": "Formatted output — more reliable than echo for scripting",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "%s",   "description": "String placeholder" },
+            { "flag": "%d",   "description": "Integer placeholder" },
+            { "flag": "%f",   "description": "Float placeholder" },
+            { "flag": "%-Ns", "description": "Left-align string in N-wide field" },
+            { "flag": "%0Nd", "description": "Zero-pad integer to N digits" },
+            { "flag": "\\n",  "description": "Newline" },
+            { "flag": "\\t",  "description": "Tab" }
+          ],
+          "examples": [
+            { "description": "Print a formatted table row", "code": "printf '%-20s %-10s %s\\n' \"$name\" \"$status\" \"$version\"" },
+            { "description": "Zero-padded counter", "code": "printf 'backup_%04d.tar.gz' $i" },
+            { "description": "Write to stderr", "code": "printf 'ERROR: %s\\n' \"$message\" >&2" }
+          ]
+        },
+        {
+          "name": "Redirection",
+          "summary": "Control where stdin, stdout, and stderr flow",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "> FILE",    "description": "Redirect stdout to FILE (overwrite)" },
+            { "flag": ">> FILE",   "description": "Append stdout to FILE" },
+            { "flag": "2> FILE",   "description": "Redirect stderr to FILE" },
+            { "flag": "2>&1",      "description": "Redirect stderr to wherever stdout goes" },
+            { "flag": "&> FILE",   "description": "Redirect both stdout and stderr to FILE" },
+            { "flag": "< FILE",    "description": "Use FILE as stdin" },
+            { "flag": "<< EOF",    "description": "Heredoc: inline multi-line stdin" },
+            { "flag": "<<< STRING","description": "Herestring: single-string stdin" },
+            { "flag": "/dev/null", "description": "Discard output entirely" }
+          ],
+          "examples": [
+            { "description": "Silence all output from a command", "code": "my_command &>/dev/null" },
+            { "description": "Log stdout to file and also show on terminal", "code": "my_command 2>&1 | tee -a /var/log/deploy.log" },
+            { "description": "Heredoc to write a multi-line file", "code": "cat > /etc/myapp/config.yaml << EOF\nhost: ${DB_HOST}\nport: ${DB_PORT}\nEOF" },
+            { "description": "Feed a string to a command without a pipe", "code": "grep 'pattern' <<< \"$my_variable\"" }
+          ]
+        },
+        {
+          "name": "xargs",
+          "summary": "Build and execute commands from standard input",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-I {}",    "description": "Replace {} with each input item" },
+            { "flag": "-n N",     "description": "Pass at most N arguments per command invocation" },
+            { "flag": "-P N",     "description": "Run up to N processes in parallel" },
+            { "flag": "-0",       "description": "Input items are null-delimited (use with find -print0)" },
+            { "flag": "-r",       "description": "Don't run command if input is empty" }
+          ],
+          "examples": [
+            { "description": "Delete files found by find (null-safe)", "code": "find /tmp -name '*.tmp' -print0 | xargs -0 rm -f" },
+            { "description": "Run a command on each item in parallel", "code": "cat servers.txt | xargs -I {} -P 4 ssh {} 'uptime'" },
+            { "description": "Pass multiple lines as individual args", "code": "cat image_list.txt | xargs -n 1 docker pull" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Text Processing",
+      "description": "Transform, filter, and extract data from text streams and files",
+      "commands": [
+        {
+          "name": "cut",
+          "summary": "Extract specific columns or character ranges from each line",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-d DELIM", "description": "Use DELIM as the field separator" },
+            { "flag": "-f N",     "description": "Select field N (1-indexed)" },
+            { "flag": "-f N-M",   "description": "Select fields N through M" },
+            { "flag": "-c N-M",   "description": "Select characters N through M" }
+          ],
+          "examples": [
+            { "description": "Extract the username from /etc/passwd", "code": "cut -d: -f1 /etc/passwd" },
+            { "description": "Get the 2nd and 3rd CSV columns", "code": "cut -d, -f2,3 data.csv" }
+          ]
+        },
+        {
+          "name": "sort",
+          "summary": "Sort lines of text",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-n",    "description": "Numeric sort" },
+            { "flag": "-r",    "description": "Reverse order" },
+            { "flag": "-k N",  "description": "Sort by Nth field" },
+            { "flag": "-t SEP","description": "Field separator character" },
+            { "flag": "-u",    "description": "Output only unique lines (deduplicate)" },
+            { "flag": "-h",    "description": "Human-readable number sort (1K, 2M, 3G)" }
+          ],
+          "examples": [
+            { "description": "Sort a CSV by 3rd column numerically", "code": "sort -t, -k3 -n data.csv" },
+            { "description": "Sort by size (from du output)", "code": "du -sh /var/log/* | sort -rh | head -10" }
+          ]
+        },
+        {
+          "name": "uniq",
+          "summary": "Report or remove adjacent duplicate lines (always sort first)",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-c",  "description": "Prefix each line with its occurrence count" },
+            { "flag": "-d",  "description": "Only print duplicate lines" },
+            { "flag": "-u",  "description": "Only print unique (non-duplicate) lines" },
+            { "flag": "-i",  "description": "Case-insensitive comparison" }
+          ],
+          "examples": [
+            { "description": "Count and rank most common log errors", "code": "grep 'ERROR' app.log | sort | uniq -c | sort -rn | head -10" }
+          ]
+        },
+        {
+          "name": "tr",
+          "summary": "Translate or delete characters in a stream",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-d",   "description": "Delete specified characters" },
+            { "flag": "-s",   "description": "Squeeze repeated characters into one" },
+            { "flag": "[:upper:]", "description": "Character class: all uppercase letters" },
+            { "flag": "[:lower:]", "description": "Character class: all lowercase letters" }
+          ],
+          "examples": [
+            { "description": "Convert string to lowercase", "code": "echo \"$MY_VAR\" | tr '[:upper:]' '[:lower:]'" },
+            { "description": "Remove all newlines from output", "code": "cat file.txt | tr -d '\\n'" },
+            { "description": "Replace colons with newlines for readability", "code": "echo $PATH | tr ':' '\\n'" }
+          ]
+        },
+        {
+          "name": "jq",
+          "summary": "Parse, filter, and transform JSON from the command line",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": ".",          "description": "Pretty-print the entire JSON" },
+            { "flag": ".key",       "description": "Access a top-level key" },
+            { "flag": ".a.b",       "description": "Access nested key" },
+            { "flag": ".[]",        "description": "Iterate over all elements of array or object" },
+            { "flag": ".[] | .key", "description": "Extract a field from each array element" },
+            { "flag": "-r",         "description": "Raw output: don't quote strings" },
+            { "flag": "--arg K V",  "description": "Pass a shell variable as a jq variable" },
+            { "flag": "select()",   "description": "Filter elements matching a condition" },
+            { "flag": "length",     "description": "Length of array, string, or object" }
+          ],
+          "examples": [
+            { "description": "Extract all pod names from kubectl JSON output", "code": "kubectl get pods -o json | jq -r '.items[].metadata.name'" },
+            { "description": "Filter array by a field value", "code": "jq '.users[] | select(.active == true) | .name' users.json" },
+            { "description": "Construct a new JSON object from fields", "code": "jq '{name: .metadata.name, status: .status.phase}' pod.json" },
+            { "description": "Pass a shell variable into jq", "code": "jq --arg env \"$ENVIRONMENT\" '.[$env].db_host' config.json" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Error Handling",
+      "description": "Patterns for writing scripts that fail safely and report clearly",
+      "commands": [
+        {
+          "name": "exit codes",
+          "summary": "Return meaningful exit codes and handle errors from commands",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "exit 0",        "description": "Exit with success" },
+            { "flag": "exit 1",        "description": "Exit with generic error" },
+            { "flag": "$?",            "description": "Exit code of the last command" },
+            { "flag": "|| exit 1",     "description": "Exit if previous command failed" },
+            { "flag": "|| true",       "description": "Allow a command to fail silently" },
+            { "flag": "&& CMD",        "description": "Run CMD only if previous succeeded" }
+          ],
+          "examples": [
+            { "description": "Exit with custom error message function", "code": "die() { printf 'ERROR: %s\\n' \"$*\" >&2; exit 1; }\n\n[[ -f config.yaml ]] || die 'config.yaml not found'" },
+            { "description": "Run a command and capture exit code", "code": "if ! my_command; then\n  echo 'Command failed' >&2\n  exit 1\nfi" },
+            { "description": "Allow a non-critical command to fail", "code": "rm -f /tmp/lock.pid || true" }
+          ]
+        },
+        {
+          "name": "getopts",
+          "summary": "Parse short command-line flags and arguments in a script",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "getopts 'abc:' opt", "description": "Parse -a, -b, and -c VALUE (colon = takes argument)" },
+            { "flag": "$OPTARG",            "description": "Value for the current option" },
+            { "flag": "$OPTIND",            "description": "Index of the next argument to process" },
+            { "flag": "shift $((OPTIND-1))","description": "Shift past all parsed options to reach positional args" }
+          ],
+          "examples": [
+            { "description": "Script with -e (environment) and -v (verbose) flags", "code": "usage() { echo \"Usage: $0 [-e env] [-v]\"; exit 1; }\n\nVERBOSE=false\nENV='dev'\n\nwhile getopts 'e:v' opt; do\n  case $opt in\n    e) ENV=$OPTARG ;;\n    v) VERBOSE=true ;;\n    *) usage ;;\n  esac\ndone\nshift $((OPTIND - 1))" }
+          ]
+        },
+        {
+          "name": "mktemp",
+          "summary": "Create unique temporary files or directories safely",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-d",          "description": "Create a temporary directory instead of a file" },
+            { "flag": "-t PREFIX",   "description": "Use PREFIX for the temp name (deprecated; use template)" },
+            { "flag": "PREFIX.XXXX", "description": "Template: X's are replaced with random characters" }
+          ],
+          "examples": [
+            { "description": "Create a temp dir and auto-clean it on exit", "code": "TMPDIR=$(mktemp -d /tmp/deploy.XXXXXX)\ntrap 'rm -rf \"$TMPDIR\"' EXIT" },
+            { "description": "Create a temp file for intermediate output", "code": "TMPFILE=$(mktemp)\nsome_command > \"$TMPFILE\"\nprocess_results \"$TMPFILE\"" }
+          ]
+        },
+        {
+          "name": "flock",
+          "summary": "Prevent concurrent script executions using file-based locking",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "-n",         "description": "Non-blocking: fail immediately if lock can't be acquired" },
+            { "flag": "-e",         "description": "Exclusive lock (default)" },
+            { "flag": "-s",         "description": "Shared lock (multiple readers allowed)" },
+            { "flag": "LOCKFILE",   "description": "File to use as the lock target" }
+          ],
+          "examples": [
+            { "description": "Ensure only one instance of a script runs at a time", "code": "exec 200>/var/lock/myscript.lock\nflock -n 200 || { echo 'Already running'; exit 1; }" },
+            { "description": "Wrap an entire script with a lock", "code": "flock -n /tmp/myscript.lock bash myscript.sh" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Process & Job Control",
+      "description": "Run commands in background, parallel, and manage subshells",
+      "commands": [
+        {
+          "name": "Background & wait",
+          "summary": "Run commands asynchronously and wait for them to complete",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "CMD &",      "description": "Run CMD in the background" },
+            { "flag": "$!",         "description": "PID of the last backgrounded process" },
+            { "flag": "wait PID",   "description": "Wait for a specific PID to finish" },
+            { "flag": "wait",       "description": "Wait for all background jobs to finish" },
+            { "flag": "jobs",       "description": "List active background jobs" }
+          ],
+          "examples": [
+            { "description": "Run tasks in parallel and wait for all to finish", "code": "deploy_service api &\ndeploy_service worker &\ndeploy_service scheduler &\nwait\necho 'All deployments complete'" },
+            { "description": "Parallel with exit code checking", "code": "pids=()\nfor svc in \"${services[@]}\"; do\n  deploy \"$svc\" & pids+=($!)\ndone\nfor pid in \"${pids[@]}\"; do\n  wait \"$pid\" || echo \"PID $pid failed\"\ndone" }
+          ]
+        },
+        {
+          "name": "Subshells & Command Substitution",
+          "summary": "Capture command output and isolate variable scope",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "$(CMD)",     "description": "Command substitution: capture stdout as a string" },
+            { "flag": "(CMD)",      "description": "Subshell: run CMD in an isolated environment" },
+            { "flag": "<(CMD)",     "description": "Process substitution: treat CMD output as a file" },
+            { "flag": ">(CMD)",     "description": "Process substitution: write into CMD's stdin" }
+          ],
+          "examples": [
+            { "description": "Capture multi-line output into a variable", "code": "RUNNING_PODS=$(kubectl get pods --field-selector=status.phase=Running -o name)" },
+            { "description": "Compare two command outputs as files", "code": "diff <(sort file1.txt) <(sort file2.txt)" },
+            { "description": "Run a block without affecting parent shell vars", "code": "(cd /tmp && tar xzf archive.tar.gz)\n# Original directory is unchanged" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "tool": "GitHub",
+  "icon": "🐙",
+  "description": "Git version control and GitHub CLI (gh) commands",
+  "categories": [
+    {
+      "name": "Git Basics",
+      "description": "Everyday git commands for version control",
+      "commands": [
+        {
+          "name": "git log",
+          "summary": "Show the commit history",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "--oneline",        "description": "Compact one-line format per commit" },
+            { "flag": "--graph",          "description": "ASCII graph of branch/merge history" },
+            { "flag": "--all",            "description": "Show all branches" },
+            { "flag": "-N",               "description": "Limit to last N commits" },
+            { "flag": "--author=",        "description": "Filter by commit author" },
+            { "flag": "--since= --until=","description": "Filter by date range" },
+            { "flag": "-p",               "description": "Show patch (diff) for each commit" },
+            { "flag": "--stat",           "description": "Show file change statistics" }
+          ],
+          "examples": [
+            { "description": "Compact branch graph for all branches", "code": "git log --oneline --graph --all" },
+            { "description": "Show last 10 commits with diffs", "code": "git log -10 -p" },
+            { "description": "Find commits by a specific author", "code": "git log --oneline --author='Jane Doe' --since='2 weeks ago'" }
+          ]
+        },
+        {
+          "name": "git diff",
+          "summary": "Show changes between commits, branches, or working tree",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "--staged",        "description": "Show staged changes (vs last commit)" },
+            { "flag": "HEAD",            "description": "All uncommitted changes" },
+            { "flag": "branch1..branch2","description": "Diff between two branches" },
+            { "flag": "--stat",          "description": "Summary of changed files and line counts" },
+            { "flag": "--name-only",     "description": "List only changed file names" }
+          ],
+          "examples": [
+            { "description": "See what's staged for the next commit", "code": "git diff --staged" },
+            { "description": "Compare current branch with main", "code": "git diff main...HEAD" },
+            { "description": "List files changed between commits", "code": "git diff --name-only HEAD~5 HEAD" }
+          ]
+        },
+        {
+          "name": "git stash",
+          "summary": "Temporarily shelve uncommitted changes",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "push -m 'msg'",   "description": "Stash with a descriptive message" },
+            { "flag": "pop",             "description": "Apply the most recent stash and remove it" },
+            { "flag": "apply stash@{N}", "description": "Apply a specific stash without removing it" },
+            { "flag": "list",            "description": "List all stashes" },
+            { "flag": "drop stash@{N}", "description": "Delete a specific stash" },
+            { "flag": "--include-untracked", "description": "Also stash new untracked files" }
+          ],
+          "examples": [
+            { "description": "Stash everything including untracked files", "code": "git stash push -m 'WIP: feature-x' --include-untracked" },
+            { "description": "Pop the latest stash", "code": "git stash pop" }
+          ]
+        },
+        {
+          "name": "git reset",
+          "summary": "Undo commits or unstage changes",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "--soft HEAD~N",  "description": "Undo N commits, keep changes staged" },
+            { "flag": "--mixed HEAD~N", "description": "Undo N commits, keep changes unstaged (default)" },
+            { "flag": "--hard HEAD~N",  "description": "Undo N commits, DISCARD all changes" },
+            { "flag": "-- FILE",        "description": "Unstage a specific file" }
+          ],
+          "examples": [
+            { "description": "Undo last commit but keep changes staged", "code": "git reset --soft HEAD~1" },
+            { "description": "Unstage a file", "code": "git reset HEAD path/to/file.txt" }
+          ],
+          "note": "--hard permanently discards changes. Make sure you don't need them before running."
+        },
+        {
+          "name": "git cherry-pick",
+          "summary": "Apply a specific commit from another branch onto the current branch",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-n",            "description": "Apply changes without creating a commit" },
+            { "flag": "--continue",    "description": "Continue after resolving conflicts" },
+            { "flag": "--abort",       "description": "Abort and return to original state" }
+          ],
+          "examples": [
+            { "description": "Apply a hotfix commit to main branch", "code": "git cherry-pick a1b2c3d4" },
+            { "description": "Apply a range of commits", "code": "git cherry-pick a1b2c3d4^..f5e6d7c8" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Branching & Merging",
+      "description": "Branch strategies, rebasing, and merge workflows",
+      "commands": [
+        {
+          "name": "git rebase",
+          "summary": "Reapply commits on top of another base commit or branch",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-i HEAD~N",    "description": "Interactive rebase of last N commits" },
+            { "flag": "--onto",       "description": "Rebase onto a different branch/commit" },
+            { "flag": "--continue",   "description": "Continue after resolving conflicts" },
+            { "flag": "--abort",      "description": "Abort the rebase and return to original state" },
+            { "flag": "--autosquash", "description": "Automatically squash fixup! and squash! commits" }
+          ],
+          "examples": [
+            { "description": "Interactively squash/reorder last 4 commits", "code": "git rebase -i HEAD~4" },
+            { "description": "Rebase feature branch onto updated main", "code": "git rebase main feature/my-feature" }
+          ],
+          "note": "Never rebase commits that have been pushed to shared branches. Use for local cleanup only."
+        },
+        {
+          "name": "git bisect",
+          "summary": "Binary search through commit history to find which commit introduced a bug",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "start",  "description": "Begin a bisect session" },
+            { "flag": "bad",    "description": "Mark current commit as bad (has the bug)" },
+            { "flag": "good HASH", "description": "Mark a known-good commit" },
+            { "flag": "reset",  "description": "End bisect and return to original branch" },
+            { "flag": "run CMD","description": "Automate with a test script" }
+          ],
+          "examples": [
+            { "description": "Start bisect to find regression", "code": "git bisect start && git bisect bad HEAD && git bisect good v2.1.0" },
+            { "description": "Automate bisect with a test script", "code": "git bisect run ./test.sh" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "GitHub CLI (gh)",
+      "description": "Manage PRs, issues, workflows, and releases from the terminal",
+      "commands": [
+        {
+          "name": "gh pr",
+          "summary": "Create, view, review, and merge pull requests",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "create",         "description": "Open a new PR (prompts for details)" },
+            { "flag": "list",           "description": "List open PRs in the repo" },
+            { "flag": "view N",         "description": "View details of PR #N" },
+            { "flag": "checkout N",     "description": "Check out the branch of PR #N locally" },
+            { "flag": "merge N",        "description": "Merge PR #N" },
+            { "flag": "review",         "description": "Submit an approval or change request" },
+            { "flag": "--draft",        "description": "Create PR as a draft" }
+          ],
+          "examples": [
+            { "description": "Create a PR with title and body", "code": "gh pr create --title 'Fix: auth timeout' --body 'Resolves #123'" },
+            { "description": "Check out a PR branch for local testing", "code": "gh pr checkout 456" },
+            { "description": "Merge PR with squash", "code": "gh pr merge 456 --squash" }
+          ]
+        },
+        {
+          "name": "gh workflow",
+          "summary": "View and trigger GitHub Actions workflows",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "list",          "description": "List all workflows in the repo" },
+            { "flag": "run NAME",      "description": "Manually trigger a workflow" },
+            { "flag": "view",          "description": "View a workflow's runs" },
+            { "flag": "-f KEY=VALUE",  "description": "Pass workflow_dispatch inputs" }
+          ],
+          "examples": [
+            { "description": "Trigger a deploy workflow on a specific branch", "code": "gh workflow run deploy.yml --ref main -f environment=production" },
+            { "description": "List recent runs for a workflow", "code": "gh run list --workflow=deploy.yml" }
+          ]
+        },
+        {
+          "name": "gh run",
+          "summary": "View and manage GitHub Actions workflow runs",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "list",       "description": "List recent workflow runs" },
+            { "flag": "view RUN_ID","description": "View details of a specific run" },
+            { "flag": "watch",      "description": "Live-watch a running workflow" },
+            { "flag": "download",   "description": "Download artifacts from a run" },
+            { "flag": "rerun",      "description": "Re-run a failed workflow" },
+            { "flag": "--failed",   "description": "Re-run only failed jobs" }
+          ],
+          "examples": [
+            { "description": "Watch a running workflow live", "code": "gh run watch" },
+            { "description": "Re-run only the failed jobs of the last run", "code": "gh run rerun --failed" },
+            { "description": "Download artifacts from run #1234567890", "code": "gh run download 1234567890" }
+          ]
+        },
+        {
+          "name": "gh release",
+          "summary": "Create and manage GitHub releases",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "create TAG",    "description": "Create a new release" },
+            { "flag": "--generate-notes", "description": "Auto-generate release notes from PRs" },
+            { "flag": "--draft",       "description": "Create as draft release" },
+            { "flag": "--prerelease",  "description": "Mark as pre-release" },
+            { "flag": "upload TAG FILE","description": "Upload an asset to an existing release" }
+          ],
+          "examples": [
+            { "description": "Create a release with auto-generated notes", "code": "gh release create v1.5.0 --generate-notes" },
+            { "description": "Upload a binary to an existing release", "code": "gh release upload v1.5.0 ./dist/myapp-linux-amd64" }
+          ]
+        }
+      ]
+    }
+  ]
+}

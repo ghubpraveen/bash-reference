@@ -1,0 +1,374 @@
+{
+  "tool": "Linux",
+  "icon": "🐧",
+  "description": "Core Linux commands for DevOps workflows",
+  "categories": [
+    {
+      "name": "File System",
+      "description": "Navigate, inspect, and manipulate the file system",
+      "commands": [
+        {
+          "name": "ls",
+          "summary": "List directory contents",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-l",  "description": "Long listing format with permissions, size, date" },
+            { "flag": "-a",  "description": "Include hidden files (dotfiles)" },
+            { "flag": "-h",  "description": "Human-readable file sizes (KB, MB, GB)" },
+            { "flag": "-R",  "description": "Recursively list subdirectories" },
+            { "flag": "-t",  "description": "Sort by modification time, newest first" },
+            { "flag": "-S",  "description": "Sort by file size, largest first" }
+          ],
+          "examples": [
+            { "description": "Long listing with hidden files and readable sizes", "code": "ls -lah /var/log" },
+            { "description": "Sort by most recently modified", "code": "ls -lt /etc" }
+          ]
+        },
+        {
+          "name": "find",
+          "summary": "Search for files and directories by name, type, size, date, or content",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-name",  "description": "Match by filename (case-sensitive)" },
+            { "flag": "-iname", "description": "Match by filename (case-insensitive)" },
+            { "flag": "-type",  "description": "f=file, d=directory, l=symlink" },
+            { "flag": "-mtime", "description": "Modified N days ago (-1 = last 24h)" },
+            { "flag": "-size",  "description": "Filter by size (e.g. +100M = over 100 MB)" },
+            { "flag": "-exec",  "description": "Run a command on each result" },
+            { "flag": "-perm",  "description": "Filter by file permissions" }
+          ],
+          "examples": [
+            { "description": "Find all .log files in /var modified in last 24h", "code": "find /var -name '*.log' -mtime -1" },
+            { "description": "Find files larger than 500MB", "code": "find / -type f -size +500M 2>/dev/null" },
+            { "description": "Find and delete temp files older than 7 days", "code": "find /tmp -type f -mtime +7 -exec rm {} \\;" }
+          ]
+        },
+        {
+          "name": "du",
+          "summary": "Estimate disk usage of files and directories",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-h",  "description": "Human-readable output (KB, MB, GB)" },
+            { "flag": "-s",  "description": "Summarize: only total for each argument" },
+            { "flag": "-d N", "description": "Limit depth of directory tree to N levels" },
+            { "flag": "--max-depth=N", "description": "Same as -d N" }
+          ],
+          "examples": [
+            { "description": "Show top-level directory sizes in /var", "code": "du -h --max-depth=1 /var | sort -rh" },
+            { "description": "Total size of current directory", "code": "du -sh ." }
+          ]
+        },
+        {
+          "name": "chmod",
+          "summary": "Change file mode (permissions)",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "-R",    "description": "Apply recursively to directories" },
+            { "flag": "u+x",   "description": "Add execute permission for owner" },
+            { "flag": "755",   "description": "rwxr-xr-x — owner full, others read+exec" },
+            { "flag": "644",   "description": "rw-r--r-- — owner rw, others read only" }
+          ],
+          "examples": [
+            { "description": "Make a script executable", "code": "chmod +x deploy.sh" },
+            { "description": "Set standard web file permissions recursively", "code": "chmod -R 755 /var/www/html" }
+          ]
+        },
+        {
+          "name": "chown",
+          "summary": "Change file owner and group",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "-R",  "description": "Apply recursively" }
+          ],
+          "examples": [
+            { "description": "Give app user ownership of a directory", "code": "chown -R appuser:appgroup /opt/myapp" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Search and Navigation",
+      "description": "Find content inside files and navigate the system quickly",
+      "commands": [
+        {
+          "name": "grep",
+          "summary": "Search text patterns in files or streams",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-r",  "description": "Recursive search through directories" },
+            { "flag": "-i",  "description": "Case-insensitive search" },
+            { "flag": "-n",  "description": "Show line numbers" },
+            { "flag": "-l",  "description": "Print only filenames with matches" },
+            { "flag": "-v",  "description": "Invert match — show lines NOT matching" },
+            { "flag": "-E",  "description": "Use extended regex (egrep)" },
+            { "flag": "-A N", "description": "Show N lines after match" },
+            { "flag": "-B N", "description": "Show N lines before match" },
+            { "flag": "-C N", "description": "Show N lines before and after match" }
+          ],
+          "examples": [
+            { "description": "Find ERROR lines in all logs, show 3 lines context", "code": "grep -rn 'ERROR' /var/log/ -C 3" },
+            { "description": "Find a process in ps output", "code": "ps aux | grep nginx | grep -v grep" },
+            { "description": "Search for IP addresses with regex", "code": "grep -E '([0-9]{1,3}\\.){3}[0-9]{1,3}' access.log" }
+          ]
+        },
+        {
+          "name": "tail",
+          "summary": "View the end of a file; follow live log output",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-f",    "description": "Follow: stream new lines as they're written" },
+            { "flag": "-n N",  "description": "Show last N lines (default 10)" },
+            { "flag": "-F",    "description": "Like -f but retry if file is rotated/missing" }
+          ],
+          "examples": [
+            { "description": "Live-stream an application log", "code": "tail -f /var/log/app/app.log" },
+            { "description": "Watch last 100 lines of nginx access log", "code": "tail -n 100 -f /var/log/nginx/access.log" },
+            { "description": "Follow multiple files at once", "code": "tail -f /var/log/nginx/error.log /var/log/app/error.log" }
+          ]
+        },
+        {
+          "name": "awk",
+          "summary": "Pattern scanning and processing — extract columns, transform text",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-F",     "description": "Set field delimiter (e.g. -F':')" },
+            { "flag": "'{print $N}'", "description": "Print the Nth column" },
+            { "flag": "NR",     "description": "Built-in: current line number" },
+            { "flag": "NF",     "description": "Built-in: number of fields in line" }
+          ],
+          "examples": [
+            { "description": "Print the 2nd column of a space-delimited file", "code": "awk '{print $2}' file.txt" },
+            { "description": "Print username and shell from /etc/passwd", "code": "awk -F: '{print $1, $7}' /etc/passwd" },
+            { "description": "Sum the values in column 3", "code": "awk '{sum += $3} END {print sum}' data.txt" }
+          ]
+        },
+        {
+          "name": "sed",
+          "summary": "Stream editor — find and replace text in files or streams",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-i",        "description": "Edit file in-place" },
+            { "flag": "-i.bak",    "description": "In-place edit, keeping .bak backup" },
+            { "flag": "-e",        "description": "Add a script expression" },
+            { "flag": "s/old/new/g", "description": "Substitute all occurrences of old with new" }
+          ],
+          "examples": [
+            { "description": "Replace all occurrences in a file", "code": "sed -i 's/localhost/prod.db.internal/g' config.yaml" },
+            { "description": "Delete lines containing a pattern", "code": "sed -i '/^#/d' config.conf" },
+            { "description": "Print lines 10 to 20", "code": "sed -n '10,20p' large_file.log" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Process Management",
+      "description": "Monitor, control, and troubleshoot running processes",
+      "commands": [
+        {
+          "name": "ps",
+          "summary": "Report a snapshot of current processes",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "aux",  "description": "All users, full details, BSD syntax (most common)" },
+            { "flag": "-ef",  "description": "Full format, UNIX syntax" },
+            { "flag": "--sort", "description": "Sort by field (e.g. --sort=-%mem)" }
+          ],
+          "examples": [
+            { "description": "Find a specific process", "code": "ps aux | grep nginx" },
+            { "description": "Show top memory consumers", "code": "ps aux --sort=-%mem | head -10" },
+            { "description": "Show process tree", "code": "ps -ef --forest" }
+          ]
+        },
+        {
+          "name": "kill / killall",
+          "summary": "Send a signal to terminate or control processes",
+          "tags": ["debug", "admin"],
+          "options": [
+            { "flag": "-9",     "description": "SIGKILL — force kill immediately, no cleanup" },
+            { "flag": "-15",    "description": "SIGTERM — graceful terminate (default)" },
+            { "flag": "-1",     "description": "SIGHUP — reload config without restart" },
+            { "flag": "-l",     "description": "List all signal names" }
+          ],
+          "examples": [
+            { "description": "Gracefully stop a process by PID", "code": "kill -15 1234" },
+            { "description": "Force-kill a hung process", "code": "kill -9 1234" },
+            { "description": "Kill all processes named nginx", "code": "killall nginx" }
+          ],
+          "note": "Prefer SIGTERM (-15) over SIGKILL (-9) to allow graceful shutdown."
+        },
+        {
+          "name": "top / htop",
+          "summary": "Interactive real-time process monitor",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-u user", "description": "Show only processes for a specific user" },
+            { "flag": "-p PID",  "description": "Monitor specific PID(s)" },
+            { "flag": "-d N",    "description": "Set refresh interval to N seconds" },
+            { "flag": "-n N",    "description": "Update N times then exit (for scripting)" }
+          ],
+          "examples": [
+            { "description": "Monitor a specific process by PID", "code": "top -p 1234" },
+            { "description": "One-shot CPU/mem snapshot (non-interactive)", "code": "top -bn1 | head -20" }
+          ]
+        },
+        {
+          "name": "lsof",
+          "summary": "List open files — identify which process has a file, port, or socket open",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-i :PORT", "description": "Show processes listening on a port" },
+            { "flag": "-p PID",   "description": "Show files opened by a PID" },
+            { "flag": "-u user",  "description": "Show files opened by a user" },
+            { "flag": "-c name",  "description": "Show files opened by processes matching name" }
+          ],
+          "examples": [
+            { "description": "Who is using port 8080?", "code": "lsof -i :8080" },
+            { "description": "What files does a process have open?", "code": "lsof -p 1234" },
+            { "description": "Find deleted files still held open (disk leak)", "code": "lsof | grep '(deleted)'" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Networking",
+      "description": "Diagnose connectivity, inspect traffic, and manage network interfaces",
+      "commands": [
+        {
+          "name": "curl",
+          "summary": "Transfer data from/to a server using various protocols",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-I",         "description": "Fetch headers only (HEAD request)" },
+            { "flag": "-v",         "description": "Verbose: show full request/response headers" },
+            { "flag": "-o FILE",    "description": "Write output to FILE instead of stdout" },
+            { "flag": "-L",         "description": "Follow redirects" },
+            { "flag": "-X METHOD",  "description": "Specify HTTP method (GET, POST, PUT, DELETE)" },
+            { "flag": "-H",         "description": "Add a request header" },
+            { "flag": "-d",         "description": "POST data body" },
+            { "flag": "-u user:pw", "description": "HTTP basic authentication" },
+            { "flag": "-k",         "description": "Skip TLS certificate verification" },
+            { "flag": "-w",         "description": "Write-out format for metrics" }
+          ],
+          "examples": [
+            { "description": "Check HTTP status code of a URL", "code": "curl -o /dev/null -s -w '%{http_code}' https://example.com" },
+            { "description": "POST JSON to an API endpoint", "code": "curl -X POST -H 'Content-Type: application/json' -d '{\"key\":\"value\"}' https://api.example.com/endpoint" },
+            { "description": "Download a file and follow redirects", "code": "curl -L -o output.tar.gz https://releases.example.com/v1.0.tar.gz" },
+            { "description": "Measure response time breakdown", "code": "curl -w 'DNS:%{time_namelookup} Connect:%{time_connect} Total:%{time_total}' -o /dev/null -s https://example.com" }
+          ]
+        },
+        {
+          "name": "ss / netstat",
+          "summary": "Display socket and network connection statistics",
+          "tags": ["debug", "network"],
+          "options": [
+            { "flag": "-t",  "description": "TCP connections" },
+            { "flag": "-u",  "description": "UDP connections" },
+            { "flag": "-l",  "description": "Listening sockets only" },
+            { "flag": "-n",  "description": "Show numeric addresses (no DNS)" },
+            { "flag": "-p",  "description": "Show process using each socket" },
+            { "flag": "-s",  "description": "Summary statistics" }
+          ],
+          "examples": [
+            { "description": "Show all listening TCP ports with process names", "code": "ss -tlnp" },
+            { "description": "Show established connections", "code": "ss -tn state established" },
+            { "description": "Count connections per remote IP", "code": "ss -tn | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -rn" }
+          ]
+        },
+        {
+          "name": "tcpdump",
+          "summary": "Capture and analyze network packets on an interface",
+          "tags": ["debug", "network"],
+          "options": [
+            { "flag": "-i IFACE",  "description": "Capture on specific interface (e.g. eth0, any)" },
+            { "flag": "-n",        "description": "Don't resolve hostnames" },
+            { "flag": "-w FILE",   "description": "Write raw packets to file (for Wireshark)" },
+            { "flag": "-r FILE",   "description": "Read from a pcap file" },
+            { "flag": "port N",    "description": "Filter by port number" },
+            { "flag": "host IP",   "description": "Filter by host IP" },
+            { "flag": "-c N",      "description": "Capture only N packets then exit" }
+          ],
+          "examples": [
+            { "description": "Capture HTTP traffic on port 80", "code": "tcpdump -i eth0 -n port 80" },
+            { "description": "Capture and save to file for analysis", "code": "tcpdump -i any -w /tmp/capture.pcap" },
+            { "description": "Capture traffic between two hosts", "code": "tcpdump -n 'host 10.0.0.1 and host 10.0.0.2'" }
+          ],
+          "note": "Requires root or CAP_NET_ADMIN. Use -c to limit packet count in production."
+        }
+      ]
+    },
+    {
+      "name": "System Diagnostics",
+      "description": "Investigate system health, resource usage, and kernel events",
+      "commands": [
+        {
+          "name": "journalctl",
+          "summary": "Query and display systemd journal logs",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-u SERVICE",  "description": "Filter by systemd unit/service" },
+            { "flag": "-f",          "description": "Follow: stream new log entries live" },
+            { "flag": "-n N",        "description": "Show last N lines" },
+            { "flag": "--since",     "description": "Show entries since time (e.g. '1 hour ago')" },
+            { "flag": "-p err",      "description": "Filter by priority (err, warn, info, debug)" },
+            { "flag": "--no-pager",  "description": "Output directly without paging" },
+            { "flag": "-b",          "description": "Show logs since last boot" }
+          ],
+          "examples": [
+            { "description": "Follow nginx logs live", "code": "journalctl -u nginx -f" },
+            { "description": "Show errors from the last hour", "code": "journalctl -p err --since '1 hour ago'" },
+            { "description": "Show logs from last boot for a service", "code": "journalctl -b -u myapp.service" }
+          ]
+        },
+        {
+          "name": "dmesg",
+          "summary": "Read kernel ring buffer messages — hardware, driver, and boot events",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-T",         "description": "Human-readable timestamps" },
+            { "flag": "-l err,crit","description": "Filter by log level" },
+            { "flag": "--follow",   "description": "Stream new kernel messages" },
+            { "flag": "-H",         "description": "Human-readable with colors (requires sudo)" }
+          ],
+          "examples": [
+            { "description": "Show recent kernel errors with timestamps", "code": "dmesg -T | grep -E 'error|fail|warn' | tail -20" },
+            { "description": "Monitor kernel messages in real time", "code": "dmesg --follow -T" },
+            { "description": "Check for OOM (Out of Memory) kills", "code": "dmesg -T | grep -i 'oom\\|killed'" }
+          ]
+        },
+        {
+          "name": "vmstat",
+          "summary": "Report virtual memory, CPU, I/O statistics in real time",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "N",   "description": "Interval in seconds between reports" },
+            { "flag": "-s",  "description": "Display memory statistics table" },
+            { "flag": "-d",  "description": "Show disk statistics" }
+          ],
+          "examples": [
+            { "description": "Report every 2 seconds, 10 times", "code": "vmstat 2 10" },
+            { "description": "Check memory summary", "code": "vmstat -s -S M" }
+          ]
+        },
+        {
+          "name": "strace",
+          "summary": "Trace system calls made by a process — essential for deep debugging",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-p PID",   "description": "Attach to a running process by PID" },
+            { "flag": "-e trace=", "description": "Filter to specific syscall types (e.g. file, network)" },
+            { "flag": "-o FILE",  "description": "Write output to file" },
+            { "flag": "-f",       "description": "Follow child processes (forks)" },
+            { "flag": "-s N",     "description": "Max string length to display (default 32)" },
+            { "flag": "-c",       "description": "Count calls and show summary statistics" }
+          ],
+          "examples": [
+            { "description": "Trace file system calls of a running app", "code": "strace -p 1234 -e trace=file" },
+            { "description": "Run a command and trace all syscalls", "code": "strace -f -o /tmp/trace.txt mycommand" },
+            { "description": "Get syscall count summary", "code": "strace -c mycommand" }
+          ],
+          "note": "strace adds overhead. Avoid on high-traffic production processes."
+        }
+      ]
+    }
+  ]
+}

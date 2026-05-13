@@ -1,0 +1,149 @@
+{
+  "tool": "Terraform",
+  "icon": "🏗",
+  "description": "Infrastructure as Code commands for provisioning and managing cloud resources",
+  "categories": [
+    {
+      "name": "Core Workflow",
+      "description": "The standard plan-apply-destroy lifecycle",
+      "commands": [
+        {
+          "name": "terraform init",
+          "summary": "Initialize a working directory: download providers and modules",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-upgrade",          "description": "Upgrade providers and modules to latest allowed versions" },
+            { "flag": "-backend-config",   "description": "Pass backend config values (e.g. for remote state)" },
+            { "flag": "-reconfigure",      "description": "Reinitialize backend, disregarding existing state" },
+            { "flag": "-migrate-state",    "description": "Migrate state from previous backend" }
+          ],
+          "examples": [
+            { "description": "Initialize with backend config from a file", "code": "terraform init -backend-config=backend.hcl" },
+            { "description": "Upgrade providers to latest", "code": "terraform init -upgrade" }
+          ]
+        },
+        {
+          "name": "terraform plan",
+          "summary": "Preview what changes will be made before applying",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-out=FILE",        "description": "Save the plan to a file for later apply" },
+            { "flag": "-var-file=FILE",   "description": "Load variable values from a .tfvars file" },
+            { "flag": "-var 'K=V'",       "description": "Set a single variable value" },
+            { "flag": "-target=RESOURCE", "description": "Plan only a specific resource" },
+            { "flag": "-destroy",         "description": "Show what destroy would do" },
+            { "flag": "-refresh-only",    "description": "Check for drift without planning changes" }
+          ],
+          "examples": [
+            { "description": "Plan with a variables file and save output", "code": "terraform plan -var-file=prod.tfvars -out=tfplan" },
+            { "description": "Check for infrastructure drift", "code": "terraform plan -refresh-only" }
+          ]
+        },
+        {
+          "name": "terraform apply",
+          "summary": "Apply the changes required to reach the desired state",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-auto-approve",    "description": "Skip interactive approval prompt" },
+            { "flag": "PLAN_FILE",        "description": "Apply a previously saved plan file" },
+            { "flag": "-target=RESOURCE", "description": "Apply only a specific resource" },
+            { "flag": "-var-file=FILE",   "description": "Load variables from a file" }
+          ],
+          "examples": [
+            { "description": "Apply a saved plan (safe, no surprises)", "code": "terraform apply tfplan" },
+            { "description": "Auto-approve for CI/CD pipelines", "code": "terraform apply -var-file=prod.tfvars -auto-approve" }
+          ],
+          "note": "Always review `terraform plan` output before running apply in production."
+        },
+        {
+          "name": "terraform destroy",
+          "summary": "Destroy all resources managed by this Terraform configuration",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "-auto-approve",    "description": "Skip confirmation (use with extreme caution)" },
+            { "flag": "-target=RESOURCE", "description": "Destroy only a specific resource" }
+          ],
+          "examples": [
+            { "description": "Tear down a specific resource", "code": "terraform destroy -target=aws_instance.web -auto-approve" }
+          ],
+          "note": "This permanently deletes infrastructure. Always double-check the plan output."
+        }
+      ]
+    },
+    {
+      "name": "State Management",
+      "description": "Inspect and manipulate Terraform state",
+      "commands": [
+        {
+          "name": "terraform state",
+          "summary": "Manage the Terraform state file — list, show, move, remove resources",
+          "tags": ["debug", "admin"],
+          "options": [
+            { "flag": "list",             "description": "List all resources in state" },
+            { "flag": "show RESOURCE",    "description": "Show attributes of a resource in state" },
+            { "flag": "mv SRC DST",       "description": "Move/rename a resource in state" },
+            { "flag": "rm RESOURCE",      "description": "Remove a resource from state (without destroying it)" },
+            { "flag": "pull",             "description": "Fetch and print the remote state" }
+          ],
+          "examples": [
+            { "description": "List all resources Terraform knows about", "code": "terraform state list" },
+            { "description": "Inspect a specific resource's state", "code": "terraform state show aws_instance.web" },
+            { "description": "Move resource to a new address after a rename", "code": "terraform state mv aws_instance.old aws_instance.new" },
+            { "description": "Remove a resource from state without destroying it", "code": "terraform state rm aws_s3_bucket.legacy" }
+          ],
+          "note": "Always back up state before running state mv or state rm commands."
+        },
+        {
+          "name": "terraform import",
+          "summary": "Import existing infrastructure into Terraform state",
+          "tags": ["admin"],
+          "options": [],
+          "examples": [
+            { "description": "Import an existing AWS instance into Terraform state", "code": "terraform import aws_instance.web i-0abc123def456" },
+            { "description": "Import an S3 bucket", "code": "terraform import aws_s3_bucket.my_bucket my-existing-bucket-name" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Inspection & Debugging",
+      "description": "Validate configs, inspect values, and diagnose issues",
+      "commands": [
+        {
+          "name": "terraform validate",
+          "summary": "Check configuration files for syntax errors and internal consistency",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-json",  "description": "Output validation results as JSON (for CI)" }
+          ],
+          "examples": [
+            { "description": "Validate all .tf files in current directory", "code": "terraform validate" }
+          ]
+        },
+        {
+          "name": "terraform output",
+          "summary": "Read output values from the Terraform state",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-json",     "description": "Output all values as JSON" },
+            { "flag": "-raw NAME", "description": "Output a single raw string value" }
+          ],
+          "examples": [
+            { "description": "Get a specific output value (e.g. load balancer DNS)", "code": "terraform output -raw lb_dns_name" },
+            { "description": "Get all outputs as JSON for scripting", "code": "terraform output -json | jq" }
+          ]
+        },
+        {
+          "name": "terraform console",
+          "summary": "Interactive console for evaluating Terraform expressions",
+          "tags": ["debug"],
+          "options": [],
+          "examples": [
+            { "description": "Open an interactive console", "code": "terraform console" },
+            { "description": "Evaluate a specific expression non-interactively", "code": "echo 'cidrsubnet(\"10.0.0.0/16\", 8, 1)' | terraform console" }
+          ]
+        }
+      ]
+    }
+  ]
+}

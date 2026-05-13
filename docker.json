@@ -1,0 +1,222 @@
+{
+  "tool": "Docker",
+  "icon": "🐳",
+  "description": "Container lifecycle management and debugging",
+  "categories": [
+    {
+      "name": "Containers",
+      "description": "Run, manage, inspect, and debug containers",
+      "commands": [
+        {
+          "name": "docker run",
+          "summary": "Create and start a new container from an image",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-d",             "description": "Detached mode — run in background" },
+            { "flag": "-it",            "description": "Interactive with TTY — for shell sessions" },
+            { "flag": "--name",         "description": "Assign a name to the container" },
+            { "flag": "-p HOST:CONT",   "description": "Publish port: map host port to container port" },
+            { "flag": "-v HOST:CONT",   "description": "Mount a volume or bind-mount a directory" },
+            { "flag": "-e KEY=VAL",     "description": "Set an environment variable" },
+            { "flag": "--env-file",     "description": "Load environment variables from a file" },
+            { "flag": "--network",      "description": "Connect to a Docker network" },
+            { "flag": "--rm",           "description": "Automatically remove container when it exits" },
+            { "flag": "--restart",      "description": "Restart policy (no, always, unless-stopped, on-failure)" },
+            { "flag": "--cpus",         "description": "Limit CPU usage (e.g. --cpus=1.5)" },
+            { "flag": "--memory",       "description": "Limit memory (e.g. --memory=512m)" }
+          ],
+          "examples": [
+            { "description": "Run nginx in background with port mapping", "code": "docker run -d --name webserver -p 80:80 nginx:latest" },
+            { "description": "Interactive shell inside a container", "code": "docker run -it --rm ubuntu:22.04 bash" },
+            { "description": "Run with env file and volume mount", "code": "docker run -d --env-file .env -v /data:/app/data myapp:1.0" }
+          ]
+        },
+        {
+          "name": "docker exec",
+          "summary": "Run a command inside a running container",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-it",  "description": "Interactive TTY — required for shell sessions" },
+            { "flag": "-u",   "description": "Run as a specific user" },
+            { "flag": "-e",   "description": "Set environment variable for the exec session" },
+            { "flag": "-w",   "description": "Set working directory inside the container" }
+          ],
+          "examples": [
+            { "description": "Open a bash shell inside a running container", "code": "docker exec -it mycontainer bash" },
+            { "description": "Run a one-off command", "code": "docker exec mycontainer cat /etc/hosts" },
+            { "description": "Check environment variables inside a container", "code": "docker exec mycontainer env" }
+          ]
+        },
+        {
+          "name": "docker logs",
+          "summary": "Fetch logs from a container's stdout/stderr",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "-f",          "description": "Follow log output in real time" },
+            { "flag": "--tail N",    "description": "Show last N lines" },
+            { "flag": "--since",     "description": "Show logs since timestamp (e.g. 1h, 2023-01-01T00:00:00)" },
+            { "flag": "--until",     "description": "Show logs before timestamp" },
+            { "flag": "-t",          "description": "Show timestamps" }
+          ],
+          "examples": [
+            { "description": "Follow logs for a container", "code": "docker logs -f --tail 100 mycontainer" },
+            { "description": "Show logs from the last 30 minutes", "code": "docker logs --since 30m mycontainer" }
+          ]
+        },
+        {
+          "name": "docker inspect",
+          "summary": "Return detailed low-level JSON information about a container, image, or network",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "--format", "description": "Format output using a Go template" }
+          ],
+          "examples": [
+            { "description": "Get a container's IP address", "code": "docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mycontainer" },
+            { "description": "Get mounted volumes", "code": "docker inspect -f '{{json .Mounts}}' mycontainer | jq" },
+            { "description": "Check restart policy and status", "code": "docker inspect -f '{{.HostConfig.RestartPolicy}}' mycontainer" }
+          ]
+        },
+        {
+          "name": "docker stats",
+          "summary": "Live stream of container resource usage (CPU, memory, network, I/O)",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "--no-stream",  "description": "One-shot snapshot instead of live stream" },
+            { "flag": "--format",     "description": "Custom output format" }
+          ],
+          "examples": [
+            { "description": "Live stats for all running containers", "code": "docker stats" },
+            { "description": "One-shot snapshot for a specific container", "code": "docker stats --no-stream mycontainer" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Images",
+      "description": "Build, tag, push, and clean up container images",
+      "commands": [
+        {
+          "name": "docker build",
+          "summary": "Build an image from a Dockerfile",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-t name:tag",    "description": "Name and tag the resulting image" },
+            { "flag": "-f FILE",        "description": "Specify an alternate Dockerfile path" },
+            { "flag": "--no-cache",     "description": "Build without using cache layers" },
+            { "flag": "--build-arg",    "description": "Pass build-time arguments (ARG in Dockerfile)" },
+            { "flag": "--platform",     "description": "Target platform (e.g. linux/amd64, linux/arm64)" },
+            { "flag": "--target",       "description": "Build to a specific multi-stage target" }
+          ],
+          "examples": [
+            { "description": "Build and tag an image from current directory", "code": "docker build -t myapp:1.2.3 ." },
+            { "description": "Build without cache for a clean build", "code": "docker build --no-cache -t myapp:latest ." },
+            { "description": "Multi-platform build", "code": "docker buildx build --platform linux/amd64,linux/arm64 -t myapp:latest --push ." }
+          ]
+        },
+        {
+          "name": "docker push / pull",
+          "summary": "Push or pull images to/from a registry",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "--all-tags",  "description": "Push/pull all tags for the repository" }
+          ],
+          "examples": [
+            { "description": "Push a tagged image to Docker Hub", "code": "docker push myuser/myapp:1.2.3" },
+            { "description": "Pull a specific version", "code": "docker pull nginx:1.25-alpine" }
+          ]
+        },
+        {
+          "name": "docker image prune",
+          "summary": "Remove dangling (untagged) or unused images to free disk space",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "-a",        "description": "Remove all unused images (not just dangling)" },
+            { "flag": "--filter",  "description": "Filter by label or date (e.g. until=24h)" },
+            { "flag": "-f",        "description": "Skip confirmation prompt" }
+          ],
+          "examples": [
+            { "description": "Remove all dangling images", "code": "docker image prune -f" },
+            { "description": "Remove images older than 48h", "code": "docker image prune -a --filter 'until=48h'" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Compose",
+      "description": "Manage multi-container applications with docker compose",
+      "commands": [
+        {
+          "name": "docker compose up",
+          "summary": "Create and start containers defined in docker-compose.yml",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-d",              "description": "Run in detached (background) mode" },
+            { "flag": "--build",         "description": "Rebuild images before starting" },
+            { "flag": "--force-recreate","description": "Recreate containers even if config unchanged" },
+            { "flag": "--scale SERVICE=N","description": "Start N replicas of a service" }
+          ],
+          "examples": [
+            { "description": "Start all services in background, rebuilding images", "code": "docker compose up -d --build" },
+            { "description": "Start only a specific service", "code": "docker compose up -d db" }
+          ]
+        },
+        {
+          "name": "docker compose down",
+          "summary": "Stop and remove containers, networks created by compose up",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-v",   "description": "Also remove named volumes" },
+            { "flag": "--rmi", "description": "Remove images (all or local)" }
+          ],
+          "examples": [
+            { "description": "Stop and remove everything including volumes", "code": "docker compose down -v" }
+          ]
+        },
+        {
+          "name": "docker compose logs",
+          "summary": "View logs from compose services",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-f",        "description": "Follow log output" },
+            { "flag": "--tail N",  "description": "Number of lines from the end" }
+          ],
+          "examples": [
+            { "description": "Follow logs for all services", "code": "docker compose logs -f" },
+            { "description": "Follow logs for a specific service", "code": "docker compose logs -f api" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cleanup & Maintenance",
+      "description": "Free up disk space and manage Docker resources",
+      "commands": [
+        {
+          "name": "docker system prune",
+          "summary": "Remove all stopped containers, unused networks, dangling images, and build cache",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "-a",  "description": "Also remove unused images (not just dangling)" },
+            { "flag": "-f",  "description": "Do not prompt for confirmation" },
+            { "flag": "--volumes", "description": "Also remove unnamed volumes" }
+          ],
+          "examples": [
+            { "description": "Full cleanup of all unused Docker resources", "code": "docker system prune -af --volumes" }
+          ],
+          "note": "This is irreversible. Do not use --volumes unless you're sure no important data is in unnamed volumes."
+        },
+        {
+          "name": "docker system df",
+          "summary": "Show Docker disk usage by images, containers, volumes, and cache",
+          "tags": ["admin"],
+          "options": [
+            { "flag": "-v",  "description": "Verbose: show all items individually" }
+          ],
+          "examples": [
+            { "description": "Check how much disk Docker is using", "code": "docker system df" }
+          ]
+        }
+      ]
+    }
+  ]
+}

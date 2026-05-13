@@ -1,0 +1,232 @@
+{
+  "tool": "Kubernetes",
+  "icon": "☸",
+  "description": "kubectl commands for cluster management, deployments, and debugging",
+  "categories": [
+    {
+      "name": "Workloads",
+      "description": "Manage deployments, pods, and replica sets",
+      "commands": [
+        {
+          "name": "kubectl get",
+          "summary": "List one or more resources in the cluster",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-n NAMESPACE",  "description": "Target a specific namespace" },
+            { "flag": "-A",            "description": "All namespaces" },
+            { "flag": "-o wide",       "description": "Extra columns (node name, IP, etc.)" },
+            { "flag": "-o yaml",       "description": "Full resource spec as YAML" },
+            { "flag": "-o json",       "description": "Full resource spec as JSON" },
+            { "flag": "-l KEY=VAL",    "description": "Filter by label selector" },
+            { "flag": "--watch / -w",  "description": "Stream live changes" },
+            { "flag": "--field-selector", "description": "Filter by field (e.g. status.phase=Running)" }
+          ],
+          "examples": [
+            { "description": "List all pods across all namespaces with node info", "code": "kubectl get pods -A -o wide" },
+            { "description": "Watch pod status in real time", "code": "kubectl get pods -n production -w" },
+            { "description": "List all pods with a specific label", "code": "kubectl get pods -l app=api -n production" },
+            { "description": "Get all resource types at once", "code": "kubectl get deploy,svc,ingress,hpa -n staging" }
+          ]
+        },
+        {
+          "name": "kubectl describe",
+          "summary": "Show detailed state, events, and conditions for a resource",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-n NAMESPACE",  "description": "Target namespace" },
+            { "flag": "-l SELECTOR",   "description": "Describe resources matching a label" }
+          ],
+          "examples": [
+            { "description": "Describe a failing pod to see events", "code": "kubectl describe pod myapp-pod-abc123 -n production" },
+            { "description": "Describe a node to check conditions and capacity", "code": "kubectl describe node ip-10-0-1-50" },
+            { "description": "Describe a deployment", "code": "kubectl describe deployment myapp -n staging" }
+          ]
+        },
+        {
+          "name": "kubectl rollout",
+          "summary": "Manage the rollout of a deployment — status, history, restart, undo",
+          "tags": ["day-to-day", "debug"],
+          "options": [
+            { "flag": "status",   "description": "Watch rollout progress until complete" },
+            { "flag": "history",  "description": "View rollout revision history" },
+            { "flag": "undo",     "description": "Roll back to previous revision" },
+            { "flag": "restart",  "description": "Restart pods in a deployment (rolling)" },
+            { "flag": "--to-revision=N", "description": "Roll back to a specific revision number" }
+          ],
+          "examples": [
+            { "description": "Watch a deployment rollout until done", "code": "kubectl rollout status deployment/myapp -n production" },
+            { "description": "Roll back after a bad deploy", "code": "kubectl rollout undo deployment/myapp -n production" },
+            { "description": "Restart pods to pick up new ConfigMap/Secret", "code": "kubectl rollout restart deployment/myapp -n production" },
+            { "description": "Roll back to a specific version", "code": "kubectl rollout undo deployment/myapp --to-revision=3 -n production" }
+          ]
+        },
+        {
+          "name": "kubectl scale",
+          "summary": "Scale the number of replicas in a deployment or statefulset",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "--replicas=N",  "description": "Desired number of replicas" }
+          ],
+          "examples": [
+            { "description": "Scale a deployment to 5 replicas", "code": "kubectl scale deployment/myapp --replicas=5 -n production" },
+            { "description": "Scale down to zero (maintenance mode)", "code": "kubectl scale deployment/myapp --replicas=0 -n production" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Debugging",
+      "description": "Diagnose pod failures, inspect logs, run ephemeral debug containers",
+      "commands": [
+        {
+          "name": "kubectl logs",
+          "summary": "Print logs from a container in a pod",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-f",              "description": "Follow log output" },
+            { "flag": "--tail=N",        "description": "Last N lines" },
+            { "flag": "--since=",        "description": "Show logs since duration (e.g. 1h, 30m)" },
+            { "flag": "-c CONTAINER",    "description": "Specific container (for multi-container pods)" },
+            { "flag": "--previous / -p", "description": "Logs from a previous crashed container" },
+            { "flag": "-l SELECTOR",     "description": "Stream logs from all pods matching a label" }
+          ],
+          "examples": [
+            { "description": "Follow logs for a deployment's pods", "code": "kubectl logs -f -l app=myapp -n production --tail=100" },
+            { "description": "Get logs from a crashed previous container", "code": "kubectl logs myapp-pod-abc123 --previous -n production" },
+            { "description": "Logs from a specific container in a pod", "code": "kubectl logs myapp-pod-abc123 -c sidecar -n production" }
+          ]
+        },
+        {
+          "name": "kubectl exec",
+          "summary": "Execute a command inside a running container",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-it",           "description": "Interactive TTY (required for shells)" },
+            { "flag": "-c CONTAINER",  "description": "Target a specific container" }
+          ],
+          "examples": [
+            { "description": "Open a shell inside a pod", "code": "kubectl exec -it myapp-pod-abc123 -n production -- bash" },
+            { "description": "Run a one-off command (check env vars)", "code": "kubectl exec myapp-pod-abc123 -- env | sort" },
+            { "description": "Check internal DNS resolution", "code": "kubectl exec myapp-pod-abc123 -- nslookup kubernetes.default" }
+          ]
+        },
+        {
+          "name": "kubectl debug",
+          "summary": "Attach an ephemeral debug container to a running pod (no restart needed)",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "-it",              "description": "Interactive TTY" },
+            { "flag": "--image=",         "description": "Debug container image (e.g. busybox, nicolaka/netshoot)" },
+            { "flag": "--share-processes", "description": "Share process namespace with target" },
+            { "flag": "--copy-to=NAME",   "description": "Create a copy of the pod for debugging" }
+          ],
+          "examples": [
+            { "description": "Attach a network debug container to a pod", "code": "kubectl debug -it myapp-pod-abc123 --image=nicolaka/netshoot -n production" },
+            { "description": "Debug a distroless container by copying the pod", "code": "kubectl debug -it --copy-to=myapp-debug --image=busybox myapp-pod-abc123 -n production" }
+          ],
+          "note": "Requires Kubernetes 1.23+ with EphemeralContainers feature gate enabled."
+        },
+        {
+          "name": "kubectl top",
+          "summary": "Show CPU and memory resource usage for pods or nodes",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "pods",          "description": "Show pod resource usage" },
+            { "flag": "nodes",         "description": "Show node resource usage" },
+            { "flag": "-n NAMESPACE",  "description": "Target namespace" },
+            { "flag": "--containers",  "description": "Show individual container metrics" },
+            { "flag": "--sort-by=cpu", "description": "Sort by cpu or memory" }
+          ],
+          "examples": [
+            { "description": "Show top CPU-consuming pods", "code": "kubectl top pods -A --sort-by=cpu" },
+            { "description": "Show node capacity utilization", "code": "kubectl top nodes" },
+            { "description": "Per-container breakdown in a namespace", "code": "kubectl top pods -n production --containers" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Config & Secrets",
+      "description": "Work with ConfigMaps, Secrets, and resource manifests",
+      "commands": [
+        {
+          "name": "kubectl apply",
+          "summary": "Apply a configuration to a resource from a file or stdin",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "-f FILE",      "description": "Apply from a file or directory" },
+            { "flag": "-f -",         "description": "Apply from stdin" },
+            { "flag": "--dry-run=client", "description": "Preview changes without applying" },
+            { "flag": "--dry-run=server", "description": "Server-side dry run (validates against API)" },
+            { "flag": "-k DIR",       "description": "Apply a kustomize directory" }
+          ],
+          "examples": [
+            { "description": "Apply all manifests in a directory", "code": "kubectl apply -f ./k8s/ -n production" },
+            { "description": "Dry-run to preview what would change", "code": "kubectl apply -f deployment.yaml --dry-run=server" },
+            { "description": "Apply from stdin (e.g. piped from helm template)", "code": "helm template myapp ./chart | kubectl apply -f -" }
+          ]
+        },
+        {
+          "name": "kubectl get secret",
+          "summary": "Retrieve a Kubernetes secret (base64 encoded)",
+          "tags": ["debug", "admin"],
+          "options": [
+            { "flag": "-o jsonpath", "description": "Extract a specific field" }
+          ],
+          "examples": [
+            { "description": "Decode a secret value", "code": "kubectl get secret myapp-secret -n production -o jsonpath='{.data.password}' | base64 -d" },
+            { "description": "List all secrets in a namespace", "code": "kubectl get secrets -n production" }
+          ],
+          "note": "Secrets are base64-encoded, not encrypted at rest by default. Use -o jsonpath and base64 -d to read values."
+        },
+        {
+          "name": "kubectl edit",
+          "summary": "Edit a resource directly in your $EDITOR",
+          "tags": ["admin"],
+          "options": [],
+          "examples": [
+            { "description": "Edit a deployment live", "code": "kubectl edit deployment/myapp -n production" },
+            { "description": "Edit a ConfigMap", "code": "kubectl edit configmap myapp-config -n production" }
+          ],
+          "note": "Edits trigger an immediate update. Use --dry-run or kubectl apply for safer workflows in production."
+        }
+      ]
+    },
+    {
+      "name": "Cluster & Context",
+      "description": "Switch clusters, namespaces, and manage kubeconfig",
+      "commands": [
+        {
+          "name": "kubectl config",
+          "summary": "View and modify kubeconfig — contexts, clusters, and credentials",
+          "tags": ["day-to-day"],
+          "options": [
+            { "flag": "get-contexts",    "description": "List all configured contexts" },
+            { "flag": "use-context",     "description": "Switch to a different context" },
+            { "flag": "current-context", "description": "Show the active context" },
+            { "flag": "set-context",     "description": "Modify a context (e.g. set default namespace)" }
+          ],
+          "examples": [
+            { "description": "Switch to production cluster context", "code": "kubectl config use-context prod-cluster" },
+            { "description": "Set default namespace for current context", "code": "kubectl config set-context --current --namespace=production" },
+            { "description": "List all available contexts", "code": "kubectl config get-contexts" }
+          ]
+        },
+        {
+          "name": "kubectl port-forward",
+          "summary": "Forward a local port to a port on a pod or service",
+          "tags": ["debug"],
+          "options": [
+            { "flag": "pod/NAME PORT",  "description": "Forward to a specific pod" },
+            { "flag": "svc/NAME PORT",  "description": "Forward to a service" }
+          ],
+          "examples": [
+            { "description": "Access a pod's HTTP server locally", "code": "kubectl port-forward pod/myapp-pod-abc123 8080:8080 -n production" },
+            { "description": "Forward to a service", "code": "kubectl port-forward svc/myapp 8080:80 -n production" },
+            { "description": "Access a remote database locally", "code": "kubectl port-forward svc/postgres 5432:5432 -n production" }
+          ]
+        }
+      ]
+    }
+  ]
+}
