@@ -498,7 +498,21 @@ esac</code></pre>
     </div>
 
   </div>
+  <script>
+  function showSection(sectionId) {
 
+      // Get all sections
+      const sections = document.querySelectorAll('.section');
+
+      // Hide all sections
+      sections.forEach(section => {
+          section.style.display = 'none';
+      });
+
+      // Show selected section
+      document.getElementById(sectionId).style.display = 'block';
+  }
+  </script>
 </body>
 </html>
 
