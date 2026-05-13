@@ -121,7 +121,12 @@
     <a class="nav-item" href="#variables">Variables & Input</a>
     <a class="nav-item" href="#logic">Conditions & Loops</a>
     <a class="nav-item" href="#pipes">Pipes & Redirection</a>
-    <a class="nav-item" href="#git">Git Commands</a>
+    <a class="nav-item" href="#git">Git & GitHub</a>
+    <a class="nav-item" href="#docker">Docker</a>
+    <a class="nav-item" href="#kubernetes">Kubernetes</a>
+    <a class="nav-item" href="#linux-admin">Linux Admin</a>
+    <a class="nav-item" href="#networking">Networking</a>
+    <a class="nav-item" href="#cloud">Cloud & Infra</a>
     <a class="nav-item" href="#patterns">CI/CD Patterns</a>
   </div>
 
@@ -278,7 +283,19 @@ esac</code></pre>
 
     <div class="section" id="git">
       <details>
-        <summary>Git Commands for CI/CD</summary>
+        <summary>Git & GitHub Commands</summary>
+
+        <div class="command-card">
+          <h3>git clone</h3>
+          <p>Clone repositories</p>
+          <pre><code>git clone https://github.com/org/repo.git</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>git status</h3>
+          <p>Show repository status</p>
+          <pre><code>git status</code></pre>
+        </div>
 
         <div class="command-card">
           <h3>git diff</h3>
@@ -291,35 +308,191 @@ esac</code></pre>
           <p>Fetch remote changes</p>
           <pre><code>git fetch origin main</code></pre>
         </div>
+
+        <div class="command-card">
+          <h3>git log</h3>
+          <p>View commit history</p>
+          <pre><code>git log --oneline --graph</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>gh pr create</h3>
+          <p>Create pull request using GitHub CLI</p>
+          <pre><code>gh pr create --base main --head feature-branch</code></pre>
+        </div>
       </details>
     </div>
 
-    <div class="section" id="patterns">
+    <div class="section" id="docker">
       <details>
-        <summary>CI/CD Bash Patterns</summary>
+        <summary>Docker Commands</summary>
 
         <div class="command-card">
-          <h3>Read git diff</h3>
-          <p>Parse changed files</p>
-          <pre><code>while read -r status file
- do
-   echo "$status -> $file"
- done <<< "$changed_files"</code></pre>
+          <h3>docker build</h3>
+          <p>Build Docker image</p>
+          <pre><code>docker build -t my-app:1.0 .</code></pre>
         </div>
 
         <div class="command-card">
-          <h3>Read config file</h3>
-          <p>Read key-value config</p>
-          <pre><code>while IFS='=' read -r pattern severity
- do
-   echo "$pattern -> $severity"
- done < severity.conf</code></pre>
+          <h3>docker run</h3>
+          <p>Run container</p>
+          <pre><code>docker run -p 8080:8080 my-app:1.0</code></pre>
         </div>
 
         <div class="command-card">
-          <h3>Fail pipeline</h3>
-          <p>Stop workflow intentionally</p>
-          <pre><code>exit 1</code></pre>
+          <h3>docker ps</h3>
+          <p>List running containers</p>
+          <pre><code>docker ps -a</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>docker logs</h3>
+          <p>View container logs</p>
+          <pre><code>docker logs -f container-id</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>docker exec</h3>
+          <p>Execute commands inside container</p>
+          <pre><code>docker exec -it container-id bash</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="kubernetes">
+      <details>
+        <summary>Kubernetes Commands</summary>
+
+        <div class="command-card">
+          <h3>kubectl get pods</h3>
+          <p>List pods</p>
+          <pre><code>kubectl get pods -A</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>kubectl describe</h3>
+          <p>Describe resources</p>
+          <pre><code>kubectl describe pod my-pod</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>kubectl logs</h3>
+          <p>View pod logs</p>
+          <pre><code>kubectl logs -f pod-name</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>kubectl exec</h3>
+          <p>Execute command inside pod</p>
+          <pre><code>kubectl exec -it pod-name -- bash</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>kubectl apply</h3>
+          <p>Apply manifests</p>
+          <pre><code>kubectl apply -f deployment.yaml</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="linux-admin">
+      <details>
+        <summary>Linux Administration Commands</summary>
+
+        <div class="command-card">
+          <h3>systemctl</h3>
+          <p>Manage Linux services</p>
+          <pre><code>systemctl status nginx</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>journalctl</h3>
+          <p>View system logs</p>
+          <pre><code>journalctl -u nginx -f</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>df</h3>
+          <p>Disk space usage</p>
+          <pre><code>df -h</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>free</h3>
+          <p>Memory usage</p>
+          <pre><code>free -m</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>top</h3>
+          <p>Monitor processes</p>
+          <pre><code>top</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="networking">
+      <details>
+        <summary>Networking Commands</summary>
+
+        <div class="command-card">
+          <h3>curl</h3>
+          <p>Make HTTP requests</p>
+          <pre><code>curl -X GET https://api.example.com</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>wget</h3>
+          <p>Download files</p>
+          <pre><code>wget https://example.com/file.zip</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>ping</h3>
+          <p>Test connectivity</p>
+          <pre><code>ping google.com</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>netstat</h3>
+          <p>Check listening ports</p>
+          <pre><code>netstat -tulpn</code></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="section" id="cloud">
+      <details>
+        <summary>Cloud & Infrastructure Commands</summary>
+
+        <div class="command-card">
+          <h3>terraform init</h3>
+          <p>Initialize Terraform project</p>
+          <pre><code>terraform init</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>terraform plan</h3>
+          <p>Preview infrastructure changes</p>
+          <pre><code>terraform plan</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>terraform apply</h3>
+          <p>Apply infrastructure changes</p>
+          <pre><code>terraform apply</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>ssh</h3>
+          <p>Connect to remote server</p>
+          <pre><code>ssh user@server-ip</code></pre>
+        </div>
+
+        <div class="command-card">
+          <h3>scp</h3>
+          <p>Copy files to remote server</p>
+          <pre><code>scp app.jar user@server:/opt/apps</code></pre>
         </div>
       </details>
     </div>
