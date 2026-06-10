@@ -38,6 +38,7 @@ const REGISTRY = [
   { file: 'kubernetes.json', label: 'Kubernetes' },
   { file: 'github.json',     label: 'GitHub'     },
   { file: 'terraform.json',  label: 'Terraform'  },
+  {file: 'interview_guide.jsx', label: 'Interview'}
 ];
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
